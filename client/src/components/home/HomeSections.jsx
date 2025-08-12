@@ -1,7 +1,7 @@
 // Parent wrapper for homepage modular sections.
 // We'll add real subcomponents next (in their own files) and drop them in where noted.
 
-import DangerAI from "./sections/DANGERAI";
+import DangerAI from "./sections/DangerAI";
 import AuthorNote from "./sections/AuthorNote";
 
 // Intended future imports (commented out for now to avoid build errors):

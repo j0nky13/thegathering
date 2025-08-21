@@ -1,7 +1,19 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 // Usage: <Hero imageSrc="/heroimage.png" />
-export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "center" }) {
+export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "center", videoSrc = "/CTAVideo.mp4" }) {
+  const [open, setOpen] = useState(false);
+
+  // Close on ESC
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   return (
     <section className="relative isolate min-h-[90vh] md:min-h-[100vh] flex items-center justify-center overflow-hidden">
       {/* Background image */}
@@ -63,16 +75,65 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           “when a man has nothing to lose, he hits the fatal button.”
         </motion.p>
 
-        <motion.a
-          href="#subscribe"
+        <motion.button
+          type="button"
+          onClick={() => setOpen(true)}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm hover:shadow-md hover:translate-y-[1px] transition"
+          className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm hover:shadow-md hover:translate-y-[1px] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls="hero-video-modal"
         >
-          Join the fight
-        </motion.a>
+         Sneak Peek
+        </motion.button>
       </div>
+      {open &&
+        createPortal(
+          (
+            <div
+              id="hero-video-modal"
+              role="dialog"
+              aria-modal="true"
+              className="fixed inset-0 z-[9999] flex items-center justify-center"
+            >
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setOpen(false)}
+              />
+
+              {/* Dialog */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="relative z-10 w-[92vw] max-w-4xl aspect-video bg-black rounded-xl shadow-2xl overflow-hidden border border-white/10"
+              >
+                {/* Close button */}
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  aria-label="Close video"
+                >
+                  ✕
+                </button>
+
+                {/* Video */}
+                <video
+                  src={videoSrc}
+                  className="h-full w-full"
+                  controls
+                  autoPlay
+                  playsInline
+                />
+              </motion.div>
+            </div>
+          ),
+          document.body
+        )}
     </section>
   );
 }

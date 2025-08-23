@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 export default function BookExtras() {
   // Fill this with real assets (png/jpg/gif). Paths assume /public.
@@ -65,6 +65,47 @@ export default function BookExtras() {
 }
 
 function ExtrasRow({ title, blurb, image, alt, audio, reverse = false }) {
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [bars, setBars] = useState([4, 10, 7]);
+
+  const togglePlay = () => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (el.paused) {
+      el.play();
+    } else {
+      el.pause();
+    }
+  };
+
+  // Animate "synth lines" while playing
+  useEffect(() => {
+    if (!isPlaying) return;
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const id = setInterval(() => {
+      setBars([rand(4, 14), rand(3, 12), rand(5, 16)]);
+    }, 180);
+    return () => clearInterval(id);
+  }, [isPlaying]);
+
+  // Wire up audio events
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => setIsPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+    };
+  }, []);
+
   return (
     <article
       className={`grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center ${
@@ -80,14 +121,49 @@ function ExtrasRow({ title, blurb, image, alt, audio, reverse = false }) {
 
         {audio && (
           <div className="mt-4">
-            <audio
-              controls
-              preload="none"
-              className="w-full max-w-md"
-            >
-              <source src={audio} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
+            {/* Hidden native element drives playback */}
+            <audio ref={audioRef} src={audio} preload="metadata" className="hidden" />
+
+            {/* Compact player */}
+            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg px-3 py-2 shadow-sm">
+              <button
+                type="button"
+                onClick={togglePlay}
+                className="h-8 w-8 rounded-full bg-[#ffce00] text-black grid place-items-center hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[#ffce00]/60"
+                aria-label={isPlaying ? "Pause audio" : "Play audio"}
+                title={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true" fill="currentColor">
+                    <rect x="5" y="4" width="5" height="16" rx="1" />
+                    <rect x="14" y="4" width="5" height="16" rx="1" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Synth lines */}
+              <div className="flex items-end gap-1 h-4 w-8">
+                <div
+                  className="w-[3px] bg-[#ffce00] rounded-full transition-[height] duration-150"
+                  style={{ height: `${bars[0]}px` }}
+                />
+                <div
+                  className="w-[3px] bg-[#ffce00] rounded-full transition-[height] duration-150"
+                  style={{ height: `${bars[1]}px` }}
+                />
+                <div
+                  className="w-[3px] bg-[#ffce00] rounded-full transition-[height] duration-150"
+                  style={{ height: `${bars[2]}px` }}
+                />
+              </div>
+
+              <div className="text-xs text-white/70 truncate max-w-[14rem]">{title}</div>
+            </div>
+
             <div className="text-xs text-white/50 mt-2">Audio: {title}</div>
           </div>
         )}

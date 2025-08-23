@@ -30,9 +30,11 @@ export default function BookPromo({
           </p>
 
           <p className="text-white/80 mt-5 leading-relaxed">
-            A post-AI apocalypse tale of control, memory, and the last human
-            decisions that matter. Dive into corrupted archives, rogue machine
-            factions, and the people trying to remember what’s true.
+             In a world silenced by AI-enforced obedience, a small group of rebels known as “The
+Gathering” emerges from the shadows. Led by a reluctant mechanic and joined by a
+curious teen, a brilliant coder, and a grizzled engineer, they uncover a plan to dismantle the
+global control system. They must risk everything to restore free will, knowing that failure
+means the permanent end of humanity as they knew it.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">

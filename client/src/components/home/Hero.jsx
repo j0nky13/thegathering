@@ -57,14 +57,14 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           COMING SOON:
         </motion.p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10, letterSpacing: "0.2em" }}
-          animate={{ opacity: 1, y: 0, letterSpacing: "0.25em" }}
+        <motion.img
+          src="/logo4.svg"
+          alt="The Gathering Logo"
+          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.45, delay: 0.05 }}
-          className="mt-2 font-mono text-3xl sm:text-5xl md:text-6xl tracking-[0.25em] text-white"
-        >
-          THE <span className="text-cyan-300">GATHERING</span>
-        </motion.h1>
+          className="mx-auto mt-4 max-w-[95%] sm:max-w-[85%] md:max-w-[70%] lg:max-w-[85%] xl:max-w-[80%]"
+        />
 
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -72,7 +72,8 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           transition={{ duration: 0.4, delay: 0.12 }}
           className="mt-5 text-white/80 italic"
         >
-          “when a man has nothing to lose, he hits the fatal button.”
+          “In a world governed by silence and submission, obedience is not a choice—it’s
+embedded in the mind.”
         </motion.p>
 
         <motion.button

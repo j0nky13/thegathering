@@ -35,9 +35,9 @@ export default function Store() {
       {/* Products grid (placeholder, modular-ready) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { title: "Hard Cover Book", original: 26.95, store: 19.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-hardcover-id" },
-          { title: "Soft Cover Book", original: 17.95, store: 14.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-paperback-id" },
-          { title: "E-Book", original: 9.95, store: 4.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-ebook-id" },
+          { title: "Hard Cover Book", store: 26.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-hardcover-id" },
+          { title: "Soft Cover Book", store: 17.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-paperback-id" },
+          { title: "E-Book", store: 9.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-ebook-id" },
           { title: "Signed Hard Cover Book", store: 29.95, tag: "Signed" },
           { title: "Special Edition Hard Cover (25 available)", store: 49.95, tag: "Limited" },
           { title: "Cover Photo (Signed) 12×18", store: 24.95, tag: "Print" },
@@ -76,16 +76,9 @@ export default function Store() {
               <h3 className="font-mono tracking-[0.15em] text-white leading-snug">{p.title}</h3>
             </div>
             <div className="mt-2 mb-2">
-              {typeof p.original === "number" ? (
-                <div className="flex items-baseline gap-3">
-                  <span className="text-white/50 line-through text-sm">${p.original.toFixed(2)}</span>
-                  <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
-                </div>
-              ) : (
-                <div className="flex items-baseline gap-3">
-                  <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
-                </div>
-              )}
+              <div className="flex items-baseline gap-3">
+                <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
+              </div>
             </div>
             {p.preorder && p.amazon ? (
               <a

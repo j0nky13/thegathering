@@ -198,7 +198,11 @@ function ExtrasModal({ item, onClose }) {
                   >
                     {playing ? (
                       <>
-                        <span className="inline-block h-3 w-3 bg-black"/>
+                        <span className="flex gap-[2px] items-end">
+                          <span className="w-1 h-3 bg-black animate-[bounce_1s_infinite]" />
+                          <span className="w-1 h-5 bg-black animate-[bounce_1.2s_infinite]" />
+                          <span className="w-1 h-4 bg-black animate-[bounce_0.8s_infinite]" />
+                        </span>
                         Pause Preview
                       </>
                     ) : (

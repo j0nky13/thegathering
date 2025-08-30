@@ -7,6 +7,7 @@ import Navbar from './components/common/Navbar'
 import Footer from './components/common/Footer'
 import Home from './pages/Home'
 import About from './pages/About'
+import AtomicInk from './pages/AtomicInk'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Store from './pages/Store'
@@ -166,6 +167,7 @@ function AppWrapper() {
       <Routes location={location}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/atomicink" element={<AtomicInk />} />
         <Route path="/store" element={<Store />} />
         <Route path="/bookextras" element={<BookExtras />} />
         <Route path="/contact" element={<Contact />} />

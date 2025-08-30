@@ -76,19 +76,17 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
 embedded in the mind.”
         </motion.p>
 
-        <motion.button
-          type="button"
-          onClick={() => setOpen(true)}
+        <motion.a
+          href="https://www.amazon.com/dp/your-book-id"
+          target="_blank"
+          rel="noopener noreferrer"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
           className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm hover:shadow-md hover:translate-y-[1px] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          aria-controls="hero-video-modal"
         >
-         Sneak Peek
-        </motion.button>
+         Preorder on Amazon
+        </motion.a>
       </div>
       {open &&
         createPortal(

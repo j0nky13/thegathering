@@ -127,6 +127,7 @@ export default function Navbar() {
   const navItems = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
+    { name: "Atomic Ink", path: "/atomicink" },
     { name: "Extras", path: "/bookextras" },
     { name: "Store", path: "/store" },
   ];
@@ -137,21 +138,40 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8 justify-center md:col-start-2">
-          {navItems.map(({ name, path }) => (
-            <NavLink
-              key={name}
-              to={path}
-              className={({ isActive }) =>
-                `font-mono text-xs uppercase tracking-[0.25em] group transition inline-flex items-center justify-center border border-white/30 rounded-md px-3 py-1 hover:bg-white/10 transition ${
-                  isActive
-                    ? "text-cyan-300"
-                    : "text-white/85"
-                }`
-              }
-            >
-              <GlitchText>{name}</GlitchText>
-            </NavLink>
-          ))}
+          {navItems.map(({ name, path }) => {
+            if (name === "Atomic Ink") {
+              return (
+                <NavLink
+                  key={name}
+                  to={path}
+                  className={({ isActive }) =>
+                    `font-mono text-xs uppercase tracking-[0.15em] whitespace-nowrap group transition inline-flex items-center justify-center border border-white/30 rounded-md px-2.5 py-1 hover:bg-white/10 transition ${
+                      isActive
+                        ? "text-cyan-300"
+                        : "text-white/85"
+                    }`
+                  }
+                >
+                  <GlitchText>{name}</GlitchText>
+                </NavLink>
+              );
+            }
+            return (
+              <NavLink
+                key={name}
+                to={path}
+                className={({ isActive }) =>
+                  `font-mono text-xs uppercase tracking-[0.25em] group transition inline-flex items-center justify-center border border-white/30 rounded-md px-3 py-1 hover:bg-white/10 transition ${
+                    isActive
+                      ? "text-cyan-300"
+                      : "text-white/85"
+                  }`
+                }
+              >
+                <GlitchText>{name}</GlitchText>
+              </NavLink>
+            );
+          })}
         </div>
 
         <div className="hidden md:flex justify-end md:col-start-3">

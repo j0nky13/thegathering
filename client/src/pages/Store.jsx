@@ -20,7 +20,7 @@ export default function Store() {
           className="rounded border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 hover:bg-white/10 transition"
           onClick={(e) => e.preventDefault()}
         >
-          Buy Now (soon)
+          Preorder (Amazon soon)
         </a>
         <a
           href="#"
@@ -35,39 +35,79 @@ export default function Store() {
       {/* Products grid (placeholder, modular-ready) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { title: "Hardcover", price: "$—", tag: "Coming soon" },
-          { title: "Paperback", price: "$—", tag: "Coming soon" },
-          { title: "eBook", price: "$—", tag: "Coming soon" },
-          { title: "Poster (A2)", price: "$—", tag: "Planned" },
-          { title: "Sticker Pack", price: "$—", tag: "Planned" },
-          { title: "T-Shirt", price: "$—", tag: "Planned" },
-        ].map((p, i) => (
+          { title: "Hard Cover Book", original: 26.95, store: 19.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-hardcover-id" },
+          { title: "Soft Cover Book", original: 17.95, store: 14.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-paperback-id" },
+          { title: "E-Book", original: 9.95, store: 4.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-ebook-id" },
+          { title: "Signed Hard Cover Book", store: 29.95, tag: "Signed" },
+          { title: "Special Edition Hard Cover (25 available)", store: 49.95, tag: "Limited" },
+          { title: "Cover Photo (Signed) 12×18", store: 24.95, tag: "Print" },
+          { title: "Cover Photo (Signed) 18×24", store: 34.95, tag: "Print" },
+        ].map((p, i) => {
+          const isPrint = p.title.toLowerCase().includes("cover photo");
+          const imgSrc = isPrint ? "/gathering-cover.jpg" : "/bookcover.png";
+          return (
           <motion.div
             key={p.title}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03, duration: 0.25 }}
-            className="rounded-2xl border border-white/10 bg-[#0c0c0c] p-5 shadow-lg"
+            className="rounded-2xl border border-white/10 bg-[#0c0c0c] p-5 shadow-lg flex flex-col"
           >
-            <img
-              src="https://placehold.co/600x360/0f0f0f/9ca3af?text=COMING%20SOON"
-              alt={`${p.title} placeholder`}
-              className="w-full h-48 object-cover rounded mb-4"
-            />
-            <div className="flex items-center justify-between">
-              <h3 className="font-mono tracking-[0.15em] text-white">{p.title}</h3>
-              <span className="text-xs text-white/60">{p.tag}</span>
+            <div className="relative mb-4">
+              <img
+                src={imgSrc}
+                alt={p.title}
+                className="w-full h-48 object-contain rounded mx-auto"
+              />
+              {/* Badge */}
+              <span
+                className={[
+                  "absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em]",
+                  p.tag === "Limited" ? "bg-fuchsia-500/15 border-fuchsia-400/30 text-fuchsia-200" :
+                  p.tag === "Signed" ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-200" :
+                  p.tag === "Preorder" ? "bg-cyan-500/15 border-cyan-400/30 text-cyan-200" :
+                  "bg-white/10 border-white/20 text-white/80"
+                ].join(" ")}
+              >
+                {p.tag}
+              </span>
             </div>
-            <div className="mt-2 text-white/80">{p.price}</div>
-            <button
-              disabled
-              className="mt-4 w-full rounded bg-cyan-500/80 text-black py-2 text-sm disabled:opacity-60"
-              title="Not available yet"
-            >
-              Add to cart (soon)
-            </button>
+            <div className="flex items-center justify-between min-h-[3.25rem]">
+              <h3 className="font-mono tracking-[0.15em] text-white leading-snug">{p.title}</h3>
+            </div>
+            <div className="mt-2 mb-2">
+              {typeof p.original === "number" ? (
+                <div className="flex items-baseline gap-3">
+                  <span className="text-white/50 line-through text-sm">${p.original.toFixed(2)}</span>
+                  <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-3">
+                  <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+            {p.preorder && p.amazon ? (
+              <a
+                href={p.amazon}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-auto w-full inline-flex items-center justify-center rounded bg-[#ffce00] text-black py-2 text-sm font-medium hover:brightness-95 transition"
+              >
+                Preorder on Amazon
+              </a>
+            ) : (
+              <button
+                disabled
+                className="mt-auto w-full rounded bg-white/10 text-white py-2 text-sm disabled:opacity-60 border border-white/15"
+                title="Not available yet"
+              >
+                Coming Soon
+              </button>
+            )}
           </motion.div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Note */}

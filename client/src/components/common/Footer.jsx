@@ -35,7 +35,8 @@ export default function Footer() {
           >
             <nav className="flex flex-col items-center text-center gap-2">
               <Link to="/about" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">About</Link>
-              <Link to="/extras" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">Book Extras</Link>
+              <Link to="/atomicink" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">Atomic Ink</Link>
+              <Link to="/bookextras" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">Book Extras</Link>
               <Link to="/store" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">Store</Link>
               <Link to="/contact" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">Contact</Link>
               <a href="#subscribe" onClick={() => setQuickOpenMobile(false)} className="px-3 py-2 rounded hover:bg-white/10 transition">Subscribe</a>
@@ -62,6 +63,7 @@ export default function Footer() {
             <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-xl border border-white/10 bg-[#0f0f0f] shadow-xl p-2 z-10">
               <nav className="flex flex-col text-center">
                 <Link to="/about" onClick={() => setQuickOpenDesktop(false)} className="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</Link>
+                <Link to="/atomicink" onClick={() => setQuickOpenDesktop(false)} className="px-3 py-2 rounded-lg hover:bg-white/10 transition">Atomic Ink</Link>
                 <Link to="/bookextras" onClick={() => setQuickOpenDesktop(false)} className="px-3 py-2 rounded-lg hover:bg-white/10 transition">Book Extras</Link>
                 <Link to="/store" onClick={() => setQuickOpenDesktop(false)} className="px-3 py-2 rounded-lg hover:bg-white/10 transition">Store</Link>
                 <Link to="/contact" onClick={() => setQuickOpenDesktop(false)} className="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</Link>
@@ -75,7 +77,7 @@ export default function Footer() {
         <div className="text-center">
           <p className="text-xs text-white/60 text-center">
             © {new Date().getFullYear()} The Gathering • Published by{" "}
-            <a href="#" className="underline decoration-dotted hover:text-white">Camber Press</a>
+            <a href="#" className="underline decoration-dotted hover:text-white">Camber Media</a>
           </p>
         </div>
       </div>

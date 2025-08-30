@@ -1,45 +1,83 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 
 export default function BookExtras() {
-  // Fill this with real assets (png/jpg/gif). Paths assume /public.
-  const items = [
-    {
-      title: "The Rise of Jacob Jones",
-      blurb:
-        "An audio vignette outlining the opening chapter.",
-      image: "/atomicink.png",
-      alt: "The Rise of Jacob Jones audio preview cover",
-      audio: "/Rise of Jacob Jones.mp3",
-    },
-    {
-      title: "The Silent Ones",
-      blurb:
-        "Everybody has to pitch in, if you don't- you don't stay.",
-      image: "/farming.png",
-      alt: "The Silent Ones",
-    },
-    {
-      title: "Walking ruins",
-      blurb:
-        "Walking through a town alone",
-      image: "/walkingruins.png",
-      alt: "Walking the ruins",
-    },
-    {
-      title: "Capital Fight",
-      blurb:
-        "Fighting the Drones.",
-      image: "/heroimage.png",
-      alt: "Drones and water",
-    },
-    {
-      title: "Atomic Ink",
-      blurb:
-        "The sound of a world on the edge. Lyrics by human hands, arrangement by machine.",
-      image: "/atomicink.png",
-      alt: "Cover art for an AI era",
-    },
-  ];
+  // Grid items 
+  const items = useMemo(
+    () => [
+      {
+        key: "setting",
+        title: "Newtown // Old City",
+        image: "/heroimage.png",
+        alt: "Capitol and drones – the world of The Gathering",
+        description:
+          "Near‑future, post‑war North America. Newtown, Missouri—sterile capital of the Federation—contrasts with its outskirts: the decaying but vibrant Old City Market where Annies survive, and Ian’s off‑grid junkyard that anchors the resistance.",
+      },
+      {
+        key: "ian",
+        title: "Ian Black",
+        image: "/ian-car.png",
+        alt: "Ian beside a car",
+        description:
+          "A reluctant leader on the fringes, haunted by past failures. Ian runs the resistance from a sprawling junkyard, driven by a responsibility to keep humanity from being erased by machines.",
+      },
+      {
+        key: "lance",
+        title: "Lance",
+        image: "/walkingruins.png", 
+        alt: "Teen walking through ruins",
+        description:
+          "A teenager adrift in a dystopia, drawn to analog relics—books, history, classic cars. Lance sees meaning in what the system discarded.",
+      },
+      {
+        key: "mara",
+        title: "Mara",
+        image: "/mara-hacking.png", 
+        alt: "Hacker at a terminal",
+        description:
+          "Brilliant, isolated coder who erased her official identity. Mara distrusts authority and uses elite skills to sabotage corrupt systems from within.",
+      },
+      {
+        key: "tobias",
+        title: "Tobias",
+        image: "/tobias-radio.png",
+        alt: "Engineer on shortwave radio",
+        description:
+          "A precise, guarded engineer and former rising VP at a government contractor. He went dark to avoid the chip and now works at the outskirts, trusting almost no one.",
+      },
+      {
+        key: "silent-ones",
+        title: "The Silent Ones",
+        image: "/farming.png", 
+        alt: "People tending fields",
+        description:
+          "A hearing‑impaired community discarded by the system. They find purpose working the land—quiet strength at the edge of a loud, automated world.",
+      },
+      {
+        key: "atomic-ink",
+        title: "Atomic Ink",
+        image: "/atomicink.png",
+        alt: "Atomic Ink artwork",
+        description:
+          "The sound of a world on the edge—lyrics by human hands, arrangement by machine. A creative question: progress, or a warning?",
+        audio: "/Rise of Jacob Jones.mp3", // optional preview
+      },
+    ],
+    []
+  );
+
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(null);
+
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    if (open) document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const handleOpen = (item) => {
+    setActive(item);
+    setOpen(true);
+  };
 
   return (
     <div className="px-4">
@@ -49,53 +87,63 @@ export default function BookExtras() {
           Book Extras
         </h1>
         <p className="text-white/70 mt-3 max-w-2xl mx-auto">
-          Concept art, GIF loops, and artifacts that expand the world of
-          <em> The Gathering</em>.
+          Concept art and artifacts that expand the world of
+          <em> The Gathering</em>. Hover for titles. Click to read more.
         </p>
       </section>
 
-      {/* Alternating rows */}
-      <section className="max-w-6xl mx-auto pb-24 space-y-16">
-        {items.map((item, i) => (
-          <ExtrasRow key={item.title} {...item} reverse={i % 2 === 1} />
-        ))}
+      {/* Grid */}
+      <section className="max-w-6xl mx-auto pb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.map((item) => (
+            <ExtrasCard key={item.key} item={item} onOpen={() => handleOpen(item)} />
+          ))}
+        </div>
       </section>
+
+      {/* Modal */}
+      {open && active && (
+        <ExtrasModal item={active} onClose={() => setOpen(false)} />)
+      }
     </div>
   );
 }
 
-function ExtrasRow({ title, blurb, image, alt, audio, reverse = false }) {
+function ExtrasCard({ item, onOpen }) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-white/20"
+    >
+      <img
+        src={item.image}
+        alt={item.alt || item.title}
+        loading="lazy"
+        className="w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      />
+      {/* Hover title overlay */}
+      <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="p-4">
+          <div className="text-white/90 font-mono uppercase tracking-[0.2em] text-sm">
+            {item.title}
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function ExtrasModal({ item, onClose }) {
   const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [bars, setBars] = useState([4, 10, 7]);
+  const [playing, setPlaying] = useState(false);
 
-  const togglePlay = () => {
-    const el = audioRef.current;
-    if (!el) return;
-    if (el.paused) {
-      el.play();
-    } else {
-      el.pause();
-    }
-  };
-
-  // Animate "synth lines" while playing
-  useEffect(() => {
-    if (!isPlaying) return;
-    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-    const id = setInterval(() => {
-      setBars([rand(4, 14), rand(3, 12), rand(5, 16)]);
-    }, 180);
-    return () => clearInterval(id);
-  }, [isPlaying]);
-
-  // Wire up audio events
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    const onEnded = () => setPlaying(false);
     el.addEventListener("play", onPlay);
     el.addEventListener("pause", onPause);
     el.addEventListener("ended", onEnded);
@@ -106,90 +154,79 @@ function ExtrasRow({ title, blurb, image, alt, audio, reverse = false }) {
     };
   }, []);
 
+  const toggle = () => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.paused ? el.play() : el.pause();
+  };
+
   return (
-    <article
-      className={`grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center ${
-        reverse ? "md:[&>div:first-child]:order-2" : ""
-      }`}
-    >
-      {/* Text column */}
-      <div>
-        <h2 className="text-lg font-mono uppercase tracking-[0.2em] text-white">
-          {title}
-        </h2>
-        <p className="text-white/75 mt-3 leading-relaxed">{blurb}</p>
+    <div className="fixed inset-0 z-[80]">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden
+      />
 
-        {audio && (
-          <div className="mt-4">
-            {/* Hidden native element drives playback */}
-            <audio ref={audioRef} src={audio} preload="metadata" className="hidden" />
-
-            {/* Compact player */}
-            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg px-3 py-2 shadow-sm">
-              <button
-                type="button"
-                onClick={togglePlay}
-                className="h-8 w-8 rounded-full bg-[#ffce00] text-black grid place-items-center hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[#ffce00]/60"
-                aria-label={isPlaying ? "Pause audio" : "Play audio"}
-                title={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying ? (
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true" fill="currentColor">
-                    <rect x="5" y="4" width="5" height="16" rx="1" />
-                    <rect x="14" y="4" width="5" height="16" rx="1" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                )}
-              </button>
-
-              {/* Synth lines */}
-              <div className="flex items-end gap-1 h-4 w-8">
-                <div
-                  className="w-[3px] bg-[#ffce00] rounded-full transition-[height] duration-150"
-                  style={{ height: `${bars[0]}px` }}
-                />
-                <div
-                  className="w-[3px] bg-[#ffce00] rounded-full transition-[height] duration-150"
-                  style={{ height: `${bars[1]}px` }}
-                />
-                <div
-                  className="w-[3px] bg-[#ffce00] rounded-full transition-[height] duration-150"
-                  style={{ height: `${bars[2]}px` }}
-                />
-              </div>
-
-              <div className="text-xs text-white/70 truncate max-w-[14rem]">{title}</div>
+      {/* Dialog */}
+      <div className="absolute inset-0 flex items-center justify-center p-4" onClick={onClose}>
+        <div
+          className="w-full max-w-3xl rounded-2xl border border-white/10 bg-[#0d0d0d] shadow-2xl overflow-hidden relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <div className="relative bg-white/5">
+              <img
+                src={item.image}
+                alt={item.alt || item.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
+            <div className="p-6 flex flex-col gap-3">
+              <h3 className="text-white font-mono uppercase tracking-[0.2em] text-sm">{item.title}</h3>
+              <p className="text-white/80 leading-relaxed">{item.description}</p>
 
-            <div className="text-xs text-white/50 mt-2">Audio: {title}</div>
+              {item.audio && (
+                <div className="mt-2">
+                  <audio ref={audioRef} src={item.audio} preload="metadata" className="hidden" />
+                  <button
+                    type="button"
+                    onClick={toggle}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#ffce00] text-black px-3 py-2 text-sm hover:brightness-95"
+                  >
+                    {playing ? (
+                      <>
+                        <span className="inline-block h-3 w-3 bg-black"/>
+                        Pause Preview
+                      </>
+                    ) : (
+                      <>
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        Play Preview
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-4 text-xs text-white/40 tracking-widest">ARTIFACT • PREVIEW</div>
+            </div>
           </div>
-        )}
-
-        {/* Optional tiny meta row (remove if you don’t want it) */}
-        <div className="mt-4 text-xs text-white/40 tracking-widest">
-          ARTIFACT • PREVIEW
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 h-9 w-9 grid place-items-center rounded-full bg-black/60 hover:bg-black/70 text-white/90 hover:text-white transition"
+            aria-label="Close"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+              <path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z" />
+            </svg>
+          </button>
         </div>
       </div>
-
-      {/* Media column */}
-      <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-white/5">
-        {/* Media */}
-        <img
-          src={image}
-          alt={alt || title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          loading="lazy"
-        />
-
-        {/* Subtle overlay + caption on hover (desktop) */}
-        <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="text-white/90 text-sm">{audio ? "Tap to play preview" : (alt || title)}</div>
-        </div>
-      </div>
-    </article>
+    </div>
   );
 }

@@ -1,5 +1,3 @@
-
-
 import { Link } from "react-router-dom";
 
 export default function AtomicInk() {
@@ -95,6 +93,41 @@ export default function AtomicInk() {
           >
             Visit Store
           </Link>
+        </div>
+      </section>
+
+      {/* Spotify Sections Side by Side */}
+      <section className="my-14 pt-10 border-t border-white/10">
+        <h2 className="text-xl font-mono uppercase tracking-[0.2em] text-white mb-6 text-center">
+          Listen on Spotify
+        </h2>
+        <div className="flex flex-col md:flex-row gap-6 justify-center">
+          <div className="flex-1">
+            <h3 className="text-center text-white/70 mb-2 font-mono uppercase tracking-[0.15em] text-sm">
+              Atomic Ink
+            </h3>
+            <iframe
+              src="https://open.spotify.com/embed/artist/6HiZNNQRuO7sZSUffY7pPL?si=AbT0VyAHSrmSPOoFILDK5A"
+              width="100%"
+              height="380"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              className="w-full rounded-lg shadow-lg"
+            ></iframe>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-center text-white/70 mb-2 font-mono uppercase tracking-[0.15em] text-sm">
+              Soundtrack
+            </h3>
+            <iframe
+              src="https://open.spotify.com/embed/playlist/5xaUrWkND9wKp9r39fQj4e"
+              width="100%"
+              height="380"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              className="w-full rounded-lg shadow-lg"
+            ></iframe>
+          </div>
         </div>
       </section>
     </div>

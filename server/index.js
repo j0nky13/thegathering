@@ -9,24 +9,51 @@ dotenv.config();
 
 const app = express();
 app.use(helmet());
-app.use(cors({ origin: true, credentials: false }));
+
+// Allow CORS from configured origin; default to true (reflect request origin) during setup
+const allowedOrigin = process.env.CORS_ORIGIN || process.env.ORIGIN || true;
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: false,
+  })
+);
 app.use(express.json());
 
 const mongoUri = process.env.MONGODB_URI;
-const dbName   = process.env.MONGODB_DB || "thegathering";
-const colName  = process.env.MONGODB_COLLECTION || "subscribers";
+// Accept either MONGO_* or MONGODB_* env keys; fall back to sensible defaults
+const dbName  = process.env.MONGO_DB || process.env.MONGODB_DB || "subscribers";
+const colName = process.env.MONGO_COLLECTION || process.env.MONGODB_COLLECTION || "subscribers";
 
 if (!mongoUri) {
   console.error("Missing MONGODB_URI");
   process.exit(1);
 }
 
-const client = new MongoClient(mongoUri); // Node driver handles SRV + pooling
-await client.connect();
-const collection = client.db(dbName).collection(colName);
+let client;
+let collection;
 
 // Simple rate limit: 5 requests / 60s per IP
 const limiter = new RateLimiterMemory({ points: 5, duration: 60 });
+
+async function init() {
+  try {
+    client = new MongoClient(mongoUri);
+    await client.connect();
+    collection = client.db(dbName).collection(colName);
+    // helpful index (no duplicates)
+    await collection.createIndex({ email: 1 }, { unique: true });
+    console.log(`Mongo connected. Using db='${dbName}', collection='${colName}'`);
+  } catch (err) {
+    console.error("Mongo init failed:", err);
+    process.exit(1);
+  }
+}
+
+// health check
+app.get("/health", (req, res) => {
+  res.json({ ok: true });
+});
 
 app.post("/api/subscribe", async (req, res) => {
   try {
@@ -54,4 +81,10 @@ app.post("/api/subscribe", async (req, res) => {
 });
 
 const port = process.env.PORT || 8080;
+await init();
 app.listen(port, () => console.log(`Subscribe API listening on ${port}`));
+
+process.on("SIGTERM", async () => {
+  try { await client?.close(); } catch {}
+  process.exit(0);
+});

@@ -1,15 +1,16 @@
 {
-  "name": "gathering-server",
+  "name": "tg-subscribe-api",
+  "private": true,
   "type": "module",
-  "main": "index.js",
-  "scripts": { "start": "node index.js" },
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
-    "mongoose": "^8.5.0",
-    "rate-limiter-flexible": "^5.0.0",
-    "zod": "^3.23.8"
+    "mongodb": "^6.8.0",
+    "rate-limiter-flexible": "^2.5.3"
   }
 }

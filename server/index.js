@@ -1,79 +1,57 @@
-import 'dotenv/config';
-import express from 'express';
-import mongoose from 'mongoose';
-import helmet from 'helmet';
-import cors from 'cors';
-import { RateLimiterMemory } from 'rate-limiter-flexible';
-import { z } from 'zod';
+import express from "express";
+import helmet from "helmet";
+import cors from "cors";
+import dotenv from "dotenv";
+import { MongoClient } from "mongodb";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+
+dotenv.config();
 
 const app = express();
-app.use(helmet({ crossOriginResourcePolicy: false })); // keep embeds working
+app.use(helmet());
+app.use(cors({ origin: true, credentials: false }));
 app.use(express.json());
-app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) ?? '*'
-}));
 
-// --- DB ---
-await mongoose.connect(process.env.MONGODB_URI);
+const mongoUri = process.env.MONGODB_URI;
+const dbName   = process.env.MONGODB_DB || "thegathering";
+const colName  = process.env.MONGODB_COLLECTION || "subscribers";
 
-// --- Model ---
-const subscriberSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true, index: true },
-  source: { type: String, default: 'hero-modal' },
-  userAgent: String,
-  ipHash: String, // optional if you want privacy; hash before saving
-  createdAt: { type: Date, default: Date.now }
-}, { timestamps: true });
+if (!mongoUri) {
+  console.error("Missing MONGODB_URI");
+  process.exit(1);
+}
 
-const Subscriber = mongoose.model('Subscriber', subscriberSchema);
+const client = new MongoClient(mongoUri); // Node driver handles SRV + pooling
+await client.connect();
+const collection = client.db(dbName).collection(colName);
 
-// --- Rate limit (IP based) ---
-const limiter = new RateLimiterMemory({ points: 5, duration: 60 }); // 5 req/min
+// Simple rate limit: 5 requests / 60s per IP
+const limiter = new RateLimiterMemory({ points: 5, duration: 60 });
 
-// --- Validation ---
-const Body = z.object({
-  email: z.string().email().max(254),
-  source: z.string().max(64).optional()
-});
-
-// --- API ---
-app.post('/api/subscribe', async (req, res) => {
+app.post("/api/subscribe", async (req, res) => {
   try {
-    await limiter.consume(req.ip);
-  } catch {
-    return res.status(429).json({ ok: false, error: 'Too many requests' });
-  }
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.ip;
+    await limiter.consume(ip).catch(() => { throw new Error("Too many"); });
 
-  const parsed = Body.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ ok: false, error: 'Invalid email' });
-  }
+    const { email } = req.body || {};
+    if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ ok: false, error: "Invalid email" });
+    }
 
-  const { email, source } = parsed.data;
-
-  try {
-    await Subscriber.updateOne(
+    const now = new Date();
+    await collection.updateOne(
       { email: email.toLowerCase() },
-      {
-        $setOnInsert: {
-          email: email.toLowerCase(),
-          source: source ?? 'hero-modal',
-          userAgent: req.headers['user-agent'] || ''
-        }
-      },
+      { $setOnInsert: { email: email.toLowerCase(), createdAt: now }, $set: { updatedAt: now } },
       { upsert: true }
     );
+
     return res.json({ ok: true });
-  } catch (e) {
-    // Duplicate key is fine => already subscribed
-    if (e?.code === 11000) return res.json({ ok: true });
-    console.error(e);
-    return res.status(500).json({ ok: false, error: 'Server error' });
+  } catch (err) {
+    if (err.message === "Too many") return res.status(429).json({ ok: false, error: "Rate limited" });
+    console.error(err);
+    return res.status(500).json({ ok: false, error: "Server error" });
   }
 });
 
-// --- Health ---
-app.get('/api/health', (_, res) => res.json({ ok: true }));
-
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log('API listening on', port));
+app.listen(port, () => console.log(`Subscribe API listening on ${port}`));

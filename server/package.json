@@ -11,6 +11,6 @@
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "mongodb": "^6.8.0",
-    "rate-limiter-flexible": "^2.5.3"
+    "rate-limiter-flexible": "^2.5.2"
   }
 }

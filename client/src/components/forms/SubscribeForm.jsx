@@ -27,7 +27,7 @@ export default function SubscribeForm() {
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@domain.com"
+        placeholder="your@email.com"
         className="w-full bg-black border border-white/20 focus:border-cyan-400 text-white px-4 py-3 rounded outline-none"
       />
       <button

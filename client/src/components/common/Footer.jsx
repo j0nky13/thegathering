@@ -76,8 +76,8 @@ export default function Footer() {
         {/* Copyright */}
         <div className="text-center">
           <p className="text-xs text-white/60 text-center">
-            © {new Date().getFullYear()} The Gathering • Published by{" "}
-            <a href="#" className="underline decoration-dotted hover:text-white">Camber Media</a>
+            © {new Date().getFullYear()} The Gathering • Powered by{" "}
+            <a href="https://marsh.monster" target="_blank" rel="noopener noreferrer" className="underline decoration-dotted hover:text-white">Marsh Monster</a>
           </p>
         </div>
       </div>

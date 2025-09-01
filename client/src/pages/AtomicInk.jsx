@@ -107,7 +107,7 @@ export default function AtomicInk() {
               Atomic Ink
             </h3>
             <iframe
-              src="https://open.spotify.com/embed/artist/6HiZNNQRuO7sZSUffY7pPL?si=AbT0VyAHSrmSPOoFILDK5A"
+              src="https://open.spotify.com/embed/album/4f8cEdSmtzl1ac0Dq7QmLs?si=la1gkJSXQbCyevjMguYU2g"
               width="100%"
               height="380"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

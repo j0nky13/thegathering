@@ -8,9 +8,7 @@ export default function SubscribeBlock() {
           JOIN THE LIST
         </h3>
         <SubscribeForm />
-        <p className="text-xs text-white/50 mt-2">
-          No spam. One email at launch.
-        </p>
+       
       </div>
     </section>
   );

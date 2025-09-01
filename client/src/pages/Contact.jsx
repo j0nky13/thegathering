@@ -46,7 +46,7 @@ export default function Contact() {
                 type="text"
                 required
                 className="w-full rounded-xl border border-white/15 bg-transparent px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-white/30"
-                placeholder="Jane Doe"
+                placeholder="Your Name"
                 autoComplete="name"
               />
             </label>
@@ -60,7 +60,7 @@ export default function Contact() {
                 type="email"
                 required
                 className="w-full rounded-xl border border-white/15 bg-transparent px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-white/30"
-                placeholder="you@domain.com"
+                placeholder="your@email.com"
                 autoComplete="email"
               />
             </label>
@@ -73,7 +73,7 @@ export default function Contact() {
                 name="message"
                 rows="6"
                 required
-                className="w-full rounded-xl border border-white/15 bg-transparent px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-white/30 resize-y"
+                className="w-full rounded-xl border border-white/15 bg-transparent px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-white/30 resize-none"
                 placeholder="Tell us what you’re looking for…"
               />
             </label>
@@ -87,11 +87,8 @@ export default function Contact() {
                 Send Message
               </button>
             </div>
-
-            {/* Privacy note */}
-            <p className="text-center text-xs text-white/50">
-              No spam. Your message is stored securely and used only to reply.
-            </p>
+<br /><br />
+           
           </form>
         ) : (
           <div className="mt-10 text-center">

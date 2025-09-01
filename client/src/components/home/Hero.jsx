@@ -5,6 +5,16 @@ import { createPortal } from "react-dom";
 // Usage: <Hero imageSrc="/heroimage.png" />
 export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "center", videoSrc = "/CTAVideo.mp4" }) {
   const [open, setOpen] = useState(false);
+  const [notifyOpen, setNotifyOpen] = useState(false);
+
+  const handleNotify = () => {
+    const anchor = document.getElementById('subscribe') || document.querySelector('[data-subscribe-anchor]');
+    if (anchor && typeof anchor.scrollIntoView === 'function') {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    setNotifyOpen(true);
+  };
 
   // Close on ESC
   useEffect(() => {
@@ -72,21 +82,19 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           transition={{ duration: 0.4, delay: 0.12 }}
           className="mt-5 text-white/80 italic"
         >
-          “In a world governed by silence and submission, obedience is not a choice—it’s
-embedded in the mind.”
+          “When the call goes out, will you answer?”
         </motion.p>
 
-        <motion.a
-          href="https://www.amazon.com/dp/your-book-id"
-          target="_blank"
-          rel="noopener noreferrer"
+        <motion.button
+          type="button"
+          onClick={handleNotify}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
           className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm hover:shadow-md hover:translate-y-[1px] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
         >
-         Preorder on Amazon
-        </motion.a>
+          Get Notified
+        </motion.button>
       </div>
       {open &&
         createPortal(
@@ -128,6 +136,88 @@ embedded in the mind.”
                   autoPlay
                   playsInline
                 />
+              </motion.div>
+            </div>
+          ),
+          document.body
+        )}
+      {notifyOpen &&
+        createPortal(
+          (
+            <div
+              id="notify-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="notify-title"
+              className="fixed inset-0 z-[9999] flex items-center justify-center"
+            >
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setNotifyOpen(false)}
+              />
+
+              {/* Dialog */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="relative z-10 w-[92vw] max-w-md bg-[#0b0b0b] rounded-xl shadow-2xl overflow-hidden border border-white/10 p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  onClick={() => setNotifyOpen(false)}
+                  className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  aria-label="Close subscribe"
+                >
+                  ✕
+                </button>
+
+                <h3 id="notify-title" className="text-white font-mono uppercase tracking-[0.2em] text-sm mb-3">Join the Waitlist</h3>
+                <p className="text-white/70 text-sm mb-4">Get an email when <span className="text-white">The Gathering</span> goes live.</p>
+
+                <form
+                  onSubmit={async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.currentTarget);
+  const email = (fd.get('email') || '').toString().trim();
+  if (!email) return;
+
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'hero-modal' })
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      alert('Subscription failed. Please try again.');
+      return;
+    }
+    setNotifyOpen(false);
+  } catch {
+    alert('Network error.');
+  }
+}}
+                  className="space-y-3"
+                >
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="you@example.com"
+                    className="w-full rounded-lg border border-white/15 bg-transparent px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-white/30"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg bg-[#ffce00] text-black py-3 font-mono text-[12px] uppercase tracking-[0.25em] hover:brightness-95"
+                  >
+                    Notify Me
+                  </button>
+                </form>
+
+                <p className="mt-3 text-[11px] text-white/40">We’ll only email you about the launch. Unsubscribe anytime.</p>
               </motion.div>
             </div>
           ),

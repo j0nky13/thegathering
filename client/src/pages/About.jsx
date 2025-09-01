@@ -60,7 +60,28 @@ export default function About() {
         <blockquote className="text-white/90 text-lg md:text-xl italic">
           “When the call goes out, will you answer?”
         </blockquote>
-
+      </section>
+      {/* Author Section */}
+      <section className="pt-16 pb-20 border-t border-white/10">
+        <h2 className="text-2xl md:text-3xl font-mono uppercase tracking-[0.2em] text-center mb-6 text-white">
+          About the Author
+        </h2>
+        <div className="space-y-5 text-white/80 leading-relaxed max-w-3xl mx-auto">
+          <p>
+            W.K. (Bill) Rader is a visionary entrepreneur, biotech innovator, and award-winning author.
+          </p>
+          <p>
+            An acclaimed storyteller, Bill is the award-winning author of <em>The Venn Effect</em>, a biographical novel exploring the convergence of biotechnology and human destiny, inspired by his innovations.
+          </p>
+          <p>
+            His latest novel, <em>The Gathering</em>, is a pulse-pounding story of rebellion, sacrifice, and the unyielding human spirit in a dystopian world of technological overreach.
+          </p>
+          <p>
+            With a passion for ethical innovation, Bill bridges science and fiction to inspire data-informed futures. Connect with him via Facebook, or his author website for collaborations, books, or inquiries.
+          </p>
+        </div>
+        <br />
+        <br />
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
           <Link
             to="/bookextras"

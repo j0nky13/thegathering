@@ -14,7 +14,7 @@ export default function Store() {
       </div>
 
       {/* Vendor buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
+      {/* <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
         <a
           href="#"
           className="rounded border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 hover:bg-white/10 transition"
@@ -28,23 +28,29 @@ export default function Store() {
           onClick={(e) => e.preventDefault()}
         >
           See at other vendors
-        </a>
+        </a> */}
         {/* When ready: replace # with Amazon/B&N/IndieBound links */}
-      </div>
+      {/* </div> */}
 
       {/* Products grid (placeholder, modular-ready) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { title: "Hard Cover Book", store: 26.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-hardcover-id" },
-          { title: "Soft Cover Book", store: 17.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-paperback-id" },
-          { title: "E-Book", store: 9.95, tag: "Preorder", preorder: true, amazon: "https://www.amazon.com/dp/your-ebook-id" },
+          { title: "Hard Cover Book", store: 26.95, tag: "Preorder", preorder: true },
+          { title: "Soft Cover Book", store: 17.95, tag: "Preorder", preorder: true },
+          { title: "E-Book", store: 9.95, tag: "Preorder", preorder: true },
           { title: "Signed Hard Cover Book", store: 29.95, tag: "Signed" },
           { title: "Special Edition Hard Cover (25 available)", store: 49.95, tag: "Limited" },
           { title: "Cover Photo (Signed) 12×18", store: 24.95, tag: "Print" },
           { title: "Cover Photo (Signed) 18×24", store: 34.95, tag: "Print" },
         ].map((p, i) => {
           const isPrint = p.title.toLowerCase().includes("cover photo");
-          const imgSrc = isPrint ? "/gathering-cover.jpg" : "/bookcover.png";
+          // Special edition cover image
+          const imgSrc =
+            p.title === "Special Edition Hard Cover (25 available)"
+              ? "/special-edition.png"
+              : isPrint
+                ? "/gathering-cover.jpg"
+                : "/bookcover.png";
           return (
           <motion.div
             key={p.title}
@@ -57,7 +63,7 @@ export default function Store() {
               <img
                 src={imgSrc}
                 alt={p.title}
-                className="w-full h-48 object-contain rounded mx-auto"
+                className={`w-full ${p.title === "Special Edition Hard Cover (25 available)" ? "h-44" : "h-48"} object-contain rounded mx-auto`}
               />
               {/* Badge */}
               <span
@@ -80,15 +86,14 @@ export default function Store() {
                 <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
               </div>
             </div>
-            {p.preorder && p.amazon ? (
-              <a
-                href={p.amazon}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-auto w-full inline-flex items-center justify-center rounded bg-[#ffce00] text-black py-2 text-sm font-medium hover:brightness-95 transition"
+            {p.preorder ? (
+              <button
+                disabled
+                className="mt-auto w-full rounded bg-white/10 text-white py-2 text-sm disabled:opacity-60 border border-white/15"
+                title="Pre-orders coming soon"
               >
-                Preorder on Amazon
-              </a>
+                Pre-orders Coming Soon
+              </button>
             ) : (
               <button
                 disabled

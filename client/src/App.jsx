@@ -12,6 +12,7 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Store from './pages/Store'
 import BookExtras from './pages/BookExtras'
+import NotFound from './pages/NotFound'
 
 // --- visual helpers ---
 function NoiseOverlay() {
@@ -172,6 +173,7 @@ function AppWrapper() {
         <Route path="/bookextras" element={<BookExtras />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </TransitionShell>
   )

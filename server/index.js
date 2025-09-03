@@ -82,11 +82,15 @@ app.get("/api/healthz", (_req, res) => {
 app.get("/api/subscribe", (_req, res) => {
   res.status(200).json({ ok: false, note: "Use POST to /api/subscribe" });
 });
+app.get("/subscribe", (_req, res) => {
+  res.status(200).json({ ok: false, note: "Use POST to /subscribe or /api/subscribe" });
+});
 
 // Explicit preflight for some strict proxies/CDNs
-app.options("/api/subscribe", cors());
+app.options(["/api/subscribe", "/subscribe"], cors());
 
-app.post("/api/subscribe", async (req, res) => {
+// Core subscribe handler reused for both routes (DO ingress may strip /api prefix)
+const handleSubscribe = async (req, res) => {
   try {
     if (!collection) return res.status(503).json({ ok: false, error: "DB unavailable" });
 
@@ -113,7 +117,9 @@ app.post("/api/subscribe", async (req, res) => {
     console.error(err);
     return res.status(500).json({ ok: false, error: "Server error" });
   }
-});
+};
+
+app.post(["/api/subscribe", "/subscribe"], handleSubscribe);
 
 const port = process.env.PORT || 8080;
 initMongoWithRetry().catch((err) => console.error("Init error:", err));

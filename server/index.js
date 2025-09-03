@@ -61,10 +61,10 @@ async function initMongoWithRetry() {
 }
 
 // Health checks — always 200 so DO readiness passes; include DB status
-app.get("/health", (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.status(200).json({ ok: true, db: Boolean(collection) });
 });
-app.get("/healthz", (_req, res) => {
+app.get("/api/healthz", (_req, res) => {
   res.status(200).json({ ok: true, db: Boolean(collection) });
 });
 

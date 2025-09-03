@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
+import clsx from "clsx";
 
 
 // Simple glitch text wrapper
@@ -100,8 +101,137 @@ function GlitchBurstPortal({ show }) {
   );
 }
 
+function SubscribeModal({ open, onClose }) {
+  if (typeof document === "undefined") return null;
+
+  // Prevent background scroll when open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose?.();
+    if (open) document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (status === "loading") return;
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const body = JSON.stringify({ email });
+      // Try /api first; if 404 (ingress prefix stripped), fall back to /subscribe
+      const tryOnce = async (path) => fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+      });
+
+      let res = await tryOnce("/api/subscribe");
+      if (res.status === 404) res = await tryOnce("/subscribe");
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.ok === false) {
+        throw new Error(data?.error || `Request failed (${res.status})`);
+      }
+      setStatus("success");
+      setMessage("Thanks! You're on the list.");
+      setEmail("");
+    } catch (err) {
+      setStatus("error");
+      setMessage(err.message || "Something went wrong");
+    }
+  }
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[1000] flex items-center justify-center"
+        >
+          {/* backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={onClose}
+          />
+
+          {/* modal */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            initial={{ opacity: 0, scale: 0.98, y: 6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 6 }}
+            transition={{ duration: 0.18 }}
+            className="relative z-[1001] w-[92vw] max-w-md rounded-xl border border-white/10 bg-[#0e0e0f] p-5 text-white shadow-2xl"
+          >
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="absolute right-3 top-3 rounded p-2 text-white/80 hover:bg-white/10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+
+            <h3 className="mb-2 font-mono text-sm uppercase tracking-[0.3em] text-white/90">
+              Join the list
+            </h3>
+            <p className="mb-4 text-sm text-white/70">
+              Get updates on preorders, extras, and release dates.
+            </p>
+
+            <form onSubmit={submit} className="space-y-3">
+              <input
+                required
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-md border border-white/15 bg-black/40 px-3 py-2 text-white placeholder-white/40 outline-none focus:border-cyan-400"
+              />
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className={clsx(
+                  "inline-flex w-full items-center justify-center rounded-md border border-white/20 bg-[#ffce00] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-black transition",
+                  status === "loading" && "opacity-80 cursor-wait"
+                )}
+              >
+                {status === "loading" ? "Joining…" : "Join"}
+              </button>
+            </form>
+
+            {message && (
+              <p className={clsx("mt-3 text-sm", status === "success" ? "text-emerald-400" : "text-rose-400")}>{message}</p>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
   const [burst, setBurst] = useState(false);
 
   function openWithBurst() {
@@ -175,12 +305,13 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex justify-end md:col-start-3">
-          <a
-            href="#subscribe"
+          <button
+            type="button"
+            onClick={() => setSubscribeOpen(true)}
             className="inline-flex items-center justify-center rounded-xl border border-white/30 bg-[#ffce00] text-black px-3 py-2 font-mono text-[11px] uppercase tracking-[0.25em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition"
           >
             Subscribe
-          </a>
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -257,18 +388,19 @@ export default function Navbar() {
                   </NavLink>
                 ))}
 
-                <a
-                  href="#subscribe"
-                  onClick={closeWithBurst}
+                <button
+                  type="button"
+                  onClick={() => { setSubscribeOpen(true); closeWithBurst(); }}
                   className="mt-6 inline-flex justify-center w-full font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-4 py-3 rounded hover:opacity-90 transition"
                 >
                   Subscribe
-                </a>
+                </button>
               </nav>
             </div>
           </motion.aside>
         )}
       </AnimatePresence>
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
     </nav>
   );
 }

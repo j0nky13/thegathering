@@ -78,6 +78,14 @@ app.get("/api/healthz", (_req, res) => {
   res.status(200).json({ ok: true });
 });
 
+// TEMP: sanity route so we can verify ingress actually reaches this component
+app.get("/api/subscribe", (_req, res) => {
+  res.status(200).json({ ok: false, note: "Use POST to /api/subscribe" });
+});
+
+// Explicit preflight for some strict proxies/CDNs
+app.options("/api/subscribe", cors());
+
 app.post("/api/subscribe", async (req, res) => {
   try {
     if (!collection) return res.status(503).json({ ok: false, error: "DB unavailable" });
@@ -110,6 +118,12 @@ app.post("/api/subscribe", async (req, res) => {
 const port = process.env.PORT || 8080;
 initMongoWithRetry().catch((err) => console.error("Init error:", err));
 app.listen(port, "0.0.0.0", () => console.log(`Subscribe API listening on ${port}`));
+
+// Last: log any unmatched route so we can see what path DO forwarded
+app.use((req, res) => {
+  console.warn("[404]", req.method, req.originalUrl);
+  res.status(404).json({ ok: false, error: "Not found" });
+});
 
 process.on("SIGTERM", async () => {
   try {

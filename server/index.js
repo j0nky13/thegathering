@@ -60,12 +60,17 @@ async function initMongoWithRetry() {
   }
 }
 
-// Health checks — always 200 so DO readiness passes; include DB status
+// root health for DigitalOcean probe
+app.get("/health", (_req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+// Health checks — always 200 so DO readiness passes; simplified response
 app.get("/api/health", (_req, res) => {
-  res.status(200).json({ ok: true, db: Boolean(collection) });
+  res.status(200).json({ ok: true });
 });
 app.get("/api/healthz", (_req, res) => {
-  res.status(200).json({ ok: true, db: Boolean(collection) });
+  res.status(200).json({ ok: true });
 });
 
 app.post("/api/subscribe", async (req, res) => {

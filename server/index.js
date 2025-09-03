@@ -60,9 +60,14 @@ async function initMongoWithRetry() {
   }
 }
 
-// root health for DigitalOcean probe
+// Health check endpoints for DigitalOcean probes
+// Always respond 200 with plain text "OK" for /health and /
 app.get("/health", (_req, res) => {
-  res.status(200).json({ ok: true });
+  res.status(200).type("text/plain").send("OK");
+});
+
+app.get("/", (_req, res) => {
+  res.status(200).type("text/plain").send("OK");
 });
 
 // Health checks — always 200 so DO readiness passes; simplified response

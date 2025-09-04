@@ -42,15 +42,18 @@ export default function Store() {
           { title: "Special Edition Hard Cover (25 available)", store: 49.95, tag: "Limited" },
           { title: "Cover Photo (Signed) 12×18", store: 24.95, tag: "Print" },
           { title: "Cover Photo (Signed) 18×24", store: 34.95, tag: "Print" },
+          { title: "T-Shirt", store: 19.95, tag: "Merch", preorder: false },
         ].map((p, i) => {
           const isPrint = p.title.toLowerCase().includes("cover photo");
           // Special edition cover image
           const imgSrc =
             p.title === "Special Edition Hard Cover (25 available)"
               ? "/special-edition.png"
-              : isPrint
-                ? "/gathering-cover.jpg"
-                : "/bookcover.png";
+              : p.title === "T-Shirt"
+                ? "/t-shirt.jpeg"
+                : isPrint
+                  ? "/gathering-cover.jpg"
+                  : "/bookcover.png";
           return (
           <motion.div
             key={p.title}

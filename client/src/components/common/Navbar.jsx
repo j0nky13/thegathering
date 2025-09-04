@@ -257,7 +257,7 @@ export default function Navbar() {
   const navItems = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "Atomic Ink", path: "/atomicink" },
+    { name: "AI Radio", path: "/atomicink" },
     { name: "Extras", path: "/bookextras" },
     { name: "Store", path: "/store" },
   ];
@@ -269,7 +269,7 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8 justify-center md:col-start-2">
           {navItems.map(({ name, path }) => {
-            if (name === "Atomic Ink") {
+            if (name === "AI Radio") {
               return (
                 <NavLink
                   key={name}
@@ -310,7 +310,7 @@ export default function Navbar() {
             onClick={() => setSubscribeOpen(true)}
             className="inline-flex items-center justify-center rounded-xl border border-white/30 bg-[#ffce00] text-black px-3 py-2 font-mono text-[11px] uppercase tracking-[0.25em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition"
           >
-            Subscribe
+            Get Notified
           </button>
         </div>
 

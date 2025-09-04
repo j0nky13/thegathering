@@ -6,7 +6,7 @@ export default function AtomicInk() {
       {/* Header */}
       <section className="text-center pt-16 pb-8">
         <h1 className="text-2xl md:text-3xl font-mono uppercase tracking-[0.25em] text-white">
-          Atomic Ink
+          Atomic Ink - A Warning
         </h1>
         <p className="text-white/70 mt-3 text-sm">The Ghost in the Machine</p>
       </section>

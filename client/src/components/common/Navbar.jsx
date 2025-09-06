@@ -393,7 +393,7 @@ export default function Navbar() {
                   onClick={() => { setSubscribeOpen(true); closeWithBurst(); }}
                   className="mt-6 inline-flex justify-center w-full font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-4 py-3 rounded hover:opacity-90 transition"
                 >
-                  Subscribe
+                  Get Notified
                 </button>
               </nav>
             </div>

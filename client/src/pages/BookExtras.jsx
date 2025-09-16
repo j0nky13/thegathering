@@ -279,7 +279,7 @@ export default function BookExtras() {
       <section className="max-w-6xl mx-auto pt-16 pb-8 text-center">
         <h1 className="text-2xl md:text-3xl font-mono uppercase tracking-[0.25em] text-white">Book Extras</h1>
         <p className="text-white/70 mt-3 max-w-2xl mx-auto">
-          A fullscreen photo lightbox of concept art and artifacts from <em>The Gathering</em>.
+          Concept art and artifacts from <em>The Gathering</em>.
         </p>
       </section>
 

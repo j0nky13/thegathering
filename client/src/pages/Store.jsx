@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 
 export default function Store() {
+  const storeUrl = import.meta.env.VITE_STORE_URL || "https://store.example.com";
+
   return (
     <section className="px-4 py-12 max-w-6xl mx-auto">
       {/* Hero */}
@@ -9,28 +11,24 @@ export default function Store() {
           STORE
         </h1>
         <p className="text-white/70 mt-3">
-          Books, signed editions, and future merch. Coming online soon.
+          A preview of books, signed editions, prints, and merch. Purchases happen on our external store.
         </p>
       </div>
 
-      {/* Vendor buttons */}
-      {/* <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
+      {/* External store CTA */}
+      <div className="flex items-center justify-center mb-12">
         <a
-          href="#"
-          className="rounded border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 hover:bg-white/10 transition"
-          onClick={(e) => e.preventDefault()}
+          href={storeUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white text-black px-4 py-2 text-sm hover:opacity-90 transition"
         >
-          Preorder (Amazon soon)
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+            <path d="M14 3h7v7h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" />
+          </svg>
+          Visit Store
         </a>
-        <a
-          href="#"
-          className="rounded border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/90 hover:bg-white/10 transition"
-          onClick={(e) => e.preventDefault()}
-        >
-          See at other vendors
-        </a> */}
-        {/* When ready: replace # with Amazon/B&N/IndieBound links */}
-      {/* </div> */}
+      </div>
 
       {/* Products grid (placeholder, modular-ready) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -89,23 +87,9 @@ export default function Store() {
                 <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
               </div>
             </div>
-            {p.preorder ? (
-              <button
-                disabled
-                className="mt-auto w-full rounded bg-white/10 text-white py-2 text-sm disabled:opacity-60 border border-white/15"
-                title="Pre-orders coming soon"
-              >
-                Pre-orders Coming Soon
-              </button>
-            ) : (
-              <button
-                disabled
-                className="mt-auto w-full rounded bg-white/10 text-white py-2 text-sm disabled:opacity-60 border border-white/15"
-                title="Not available yet"
-              >
-                Coming Soon
-              </button>
-            )}
+            <div className="mt-auto pt-3 text-xs text-white/50">
+              Preview of what will be offered — checkout happens on our external store.
+            </div>
           </motion.div>
           );
         })}
@@ -113,10 +97,8 @@ export default function Store() {
 
       {/* Note */}
       <p className="mt-10 text-center text-xs text-white/50">
-        Want to be notified when the store goes live?{" "}
-        <a href="#subscribe" className="underline decoration-dotted hover:text-white">
-          Join the list
-        </a>
+        The cart lives on our external store. Want an email when it goes live? {" "}
+        <a href="#subscribe" className="underline decoration-dotted hover:text-white">Join the list</a>.
       </p>
     </section>
   );

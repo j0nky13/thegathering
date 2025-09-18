@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Store() {
   // Data (includes Coming Soon entries + Square links)
@@ -83,17 +84,17 @@ export default function Store() {
           type="button"
           aria-label="Previous"
           onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-16 w-16 sm:h-12 sm:w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300"
         >
-          <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-5 sm:w-5" fill="currentColor"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          <ChevronLeft className="h-10 w-10 sm:h-8 sm:w-8" />
         </button>
         <button
           type="button"
           aria-label="Next"
           onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-16 w-16 sm:h-12 sm:w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300"
         >
-          <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-5 sm:w-5" fill="currentColor"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+          <ChevronRight className="h-10 w-10 sm:h-8 sm:w-8" />
         </button>
 
         {/* Gradient edge hints */}

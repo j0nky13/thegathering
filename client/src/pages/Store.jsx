@@ -83,17 +83,17 @@ export default function Store() {
           type="button"
           aria-label="Previous"
           onClick={prev}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-12 w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-16 w-16 sm:h-12 sm:w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
         >
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-5 sm:w-5" fill="currentColor"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
         </button>
         <button
           type="button"
           aria-label="Next"
           onClick={next}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-12 w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-16 w-16 sm:h-12 sm:w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
         >
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+          <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-5 sm:w-5" fill="currentColor"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
         </button>
 
         {/* Gradient edge hints */}
@@ -101,7 +101,7 @@ export default function Store() {
         <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#0c0c0c] to-transparent" />
 
         {/* Centered row with slide/fade between pages */}
-        <div className="mx-auto py-2 px-12">
+        <div className="mx-auto py-2 px-14 sm:px-12">
           <div className="flex items-stretch justify-center gap-6 sm:gap-8 will-change-transform">
             {view.map((item, i) => (
               <Card

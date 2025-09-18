@@ -99,6 +99,46 @@ export default function BookExtras() {
 
   const [pdfOpen, setPdfOpen] = useState(false);
 
+  const [shareToast, setShareToast] = useState(false);
+  const hideToastRef = useRef(null);
+
+  const showShareToast = () => {
+    setShareToast(true);
+    clearTimeout(hideToastRef.current);
+    hideToastRef.current = setTimeout(() => setShareToast(false), 1600);
+  };
+
+  const currentSlideUrl = (idx = selectedIndex) => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("slide", String(idx + 1));
+      url.searchParams.delete("peek");
+      return url.toString();
+    } catch {
+      return window.location.href;
+    }
+  };
+
+  const shareCurrent = async () => {
+    const url = currentSlideUrl();
+    const title = items[selectedIndex]?.title || 'Photo';
+    const text = `Check this out: ${title}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url });
+        return;
+      }
+    } catch (_) {
+      // Fall through to clipboard
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showShareToast();
+    } catch (_) {
+      window.prompt('Copy this link', url);
+    }
+  };
+
   // Deep-link for PDF (?peek=1)
   const setURLPeek = () => {
     try {
@@ -123,7 +163,21 @@ export default function BookExtras() {
         title: "", // hide default top-left title
         description: (
           <div>
-            <div className="lb-cap-title">{it.title}</div>
+            <div className="lb-cap-row">
+              <div className="lb-cap-title">{it.title}</div>
+              <button
+                type="button"
+                className="lb-share-btn"
+                onClick={shareCurrent}
+                aria-label="Share this image"
+                title="Share this image"
+              >
+                <svg viewBox="0 0 24 24" className="lb-share-ico" fill="currentColor" aria-hidden>
+                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.02-4.11c.54.5 1.25.81 2.07.81A2.99 2.99 0 0 0 21 5a3 3 0 1 0-5.91.7L8.07 9.81A3.02 3.02 0 0 0 6 9a3 3 0 1 0 0 6c.82 0 1.57-.31 2.13-.82l7.02 4.11c-.05.21-.08.43-.08.66a3 3 0 1 0 3-3.87z" />
+                </svg>
+                <span className="lb-share-label">Share</span>
+              </button>
+            </div>
             <div className="lb-cap-desc">{it.description}</div>
           </div>
         ),
@@ -224,6 +278,8 @@ export default function BookExtras() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  useEffect(() => () => clearTimeout(hideToastRef.current), []);
+
   return (
     <div className="px-4">
       <style>{`
@@ -250,6 +306,11 @@ export default function BookExtras() {
           font-size: 16px;
           line-height: 1.6;
         }
+        .lb-cap-row { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; }
+        .lb-share-btn { display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:9999px; background:#fff; color:#000; font-size:12px; line-height:1; box-shadow:0 6px 18px rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.1); }
+        .lb-share-btn:hover { opacity:.9 }
+        .lb-share-ico { width:14px; height:14px; }
+        @media (max-width: 480px) { .lb-share-label { display:none } }
         .yarl__slide_description {
           display: flex;
           flex-direction: column;
@@ -315,17 +376,14 @@ export default function BookExtras() {
       {/* Sneak Peek: Chapter 1 PDF */}
       <section className="max-w-6xl mx-auto pb-24 text-center flex flex-col items-center">
         <h2 className="text-xl md:text-2xl font-mono uppercase tracking-[0.2em] text-white mb-4">Sneak Peek: Chapter 1</h2>
-        <p className="text-white/70 mb-4">Tap/Click one of the options below to view a sneak peek!</p>
+        <p className="text-white/70 mb-4">Click the link for a sneak peek!</p>
         <div className="flex items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={openPDF}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black hover:opacity-90"
+          <a
+            href="/sneakpeek.pdf"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15"
           >
-            
-            Sneak Peek of Chapter 1
-          </button>
-          <a href="/sneakpeek.pdf" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15">
             Open in new tab
           </a>
         </div>
@@ -352,6 +410,15 @@ export default function BookExtras() {
           },
         }}
       />
+
+
+      {shareToast && (
+        <div className="fixed inset-x-0 bottom-6 z-[95] flex justify-center">
+          <div className="text-xs px-3 py-2 rounded-lg bg-white/90 text-black shadow-md">
+            Link copied ✓
+          </div>
+        </div>
+      )}
 
       {pdfOpen && (
         <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">

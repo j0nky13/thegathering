@@ -1,105 +1,195 @@
-import { motion } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 export default function Store() {
-  const storeUrl = import.meta.env.VITE_STORE_URL || "https://store.example.com";
+  // Data (includes Coming Soon entries + Square links)
+  const items = useMemo(
+    () => [
+      { key: "hardback", title: "Hardback", subtitle: "First edition hardback", href: null, comingSoon: true, img: "/bookcover.png" },
+      { key: "ebook", title: "eBook", subtitle: "Kindle/EPUB/PDF", href: null, comingSoon: true, img: "/bookcover.png" },
+      { key: "special", title: "Special Edition", subtitle: "Foil, extras, numbered", href: null, comingSoon: true, img: "/special-edition.png" },
+      { key: "posters", title: "Posters", subtitle: "Large-format prints", href: "https://square.link/u/wZc9j7Tv", img: "/gathering-cover.jpg" },
+      { key: "shirts", title: "Shirts", subtitle: "Soft tees, bold art", href: "https://square.link/u/mirlyzq6", img: "/t-shirt.jpeg" },
+      { key: "sticker-books", title: "Sticker Books", subtitle: "Collectible mini prints", href: "https://square.link/u/Mm34VSdg", img: "/Gathering-Circle.png" },
+      { key: "signed-limited", title: "Signed & Limited", subtitle: "Signatures & numbered runs", href: "https://square.link/u/st5CKlyn", img: "/special-edition.png" },
+    ],
+    []
+  );
+
+  const len = items.length;
+
+  // Responsive: desktop shows 3 per view, mobile 1 per view
+  const [visible, setVisible] = useState(1);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const setFromMQ = () => setVisible(mq.matches ? 3 : 1);
+    setFromMQ();
+    mq.addEventListener ? mq.addEventListener('change', setFromMQ) : mq.addListener(setFromMQ);
+    return () => {
+      mq.removeEventListener ? mq.removeEventListener('change', setFromMQ) : mq.removeListener(setFromMQ);
+    };
+  }, []);
+
+  // Active index points to the first visible item in the current page
+  const [active, setActive] = useState(1);
+
+  // Toast for coming soon
+  const [toast, setToast] = useState("");
+  const toastTimer = useRef(null);
+  const showToast = (msg) => {
+    setToast(msg);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), 1400);
+  };
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  // Navigation (infinite by modulo)
+  const step = visible; // 3 on desktop, 1 on mobile
+  const prev = () => { setActive((i) => (i - step + len) % len); };
+  const next = () => { setActive((i) => (i + step) % len); };
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowLeft') { prev(); }
+      if (e.key === 'ArrowRight') { next(); }
+      if (e.key === 'Enter') openCenter();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [len, step, visible]);
+
+  // Visible slice (always centered in layout)
+  const view = Array.from({ length: visible }, (_, i) => items[(active + i) % len]);
+  const centerIdxInView = Math.floor((visible - 1) / 2);
+  const centerItem = view[centerIdxInView] || view[0];
+
+  const openCenter = () => {
+    const it = centerItem;
+    if (!it || !it.href) return showToast('Coming soon');
+    window.open(it.href, '_blank', 'noopener,noreferrer');
+  };
 
   return (
-    <section className="px-4 py-12 max-w-6xl mx-auto">
+    <section className="px-4 py-12 max-w-6xl mx-auto overflow-x-hidden">
       {/* Hero */}
       <div className="mb-10 text-center">
-        <h1 className="font-mono tracking-[0.25em] text-2xl sm:text-3xl text-white">
-          STORE
-        </h1>
-        <p className="text-white/70 mt-3">
-          A preview of books, signed editions, prints, and merch. Purchases happen on our external store.
-        </p>
+        <h1 className="font-mono tracking-[0.25em] text-2xl sm:text-3xl text-white">STORE</h1>
+        <p className="text-white/70 mt-3">A clean, centered carousel. Desktop shows 3 items; mobile shows 1.</p>
       </div>
 
-      {/* External store CTA */}
-      <div className="flex items-center justify-center mb-12">
-        <a
-          href={storeUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white text-black px-4 py-2 text-sm hover:opacity-90 transition"
+      {/* Stage */}
+      <div className="relative w-full overflow-hidden">
+        {/* Arrows */}
+        <button
+          type="button"
+          aria-label="Previous"
+          onClick={prev}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-12 w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
-            <path d="M14 3h7v7h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" />
-          </svg>
-          Visit Store
-        </a>
-      </div>
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <button
+          type="button"
+          aria-label="Next"
+          onClick={next}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-12 w-12 grid place-items-center rounded-full bg-black/70 text-white hover:bg-black/80 shadow-lg"
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+        </button>
 
-      {/* Products grid (placeholder, modular-ready) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[
-          { title: "Hard Cover Book", store: 26.95, tag: "Preorder", preorder: true },
-          { title: "Soft Cover Book", store: 17.95, tag: "Preorder", preorder: true },
-          { title: "E-Book", store: 9.95, tag: "Preorder", preorder: true },
-          { title: "Signed Hard Cover Book", store: 29.95, tag: "Signed" },
-          { title: "Special Edition Hard Cover (25 available)", store: 49.95, tag: "Limited" },
-          { title: "Cover Photo (Signed) 12×18", store: 24.95, tag: "Print" },
-          { title: "Cover Photo (Signed) 18×24", store: 34.95, tag: "Print" },
-          { title: "T-Shirt", store: 19.95, tag: "Merch", preorder: false },
-        ].map((p, i) => {
-          const isPrint = p.title.toLowerCase().includes("cover photo");
-          // Special edition cover image
-          const imgSrc =
-            p.title === "Special Edition Hard Cover (25 available)"
-              ? "/special-edition.png"
-              : p.title === "T-Shirt"
-                ? "/t-shirt.jpeg"
-                : isPrint
-                  ? "/gathering-cover.jpg"
-                  : "/bookcover.png";
-          return (
-          <motion.div
-            key={p.title}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.03, duration: 0.25 }}
-            className="rounded-2xl border border-white/10 bg-[#0c0c0c] p-5 shadow-lg flex flex-col"
-          >
-            <div className="relative mb-4">
-              <img
-                src={imgSrc}
-                alt={p.title}
-                className={`w-full ${p.title === "Special Edition Hard Cover (25 available)" ? "h-44" : "h-48"} object-contain rounded mx-auto`}
+        {/* Gradient edge hints */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#0c0c0c] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#0c0c0c] to-transparent" />
+
+        {/* Centered row with slide/fade between pages */}
+        <div className="mx-auto py-2 px-12">
+          <div className="flex items-stretch justify-center gap-6 sm:gap-8 will-change-transform">
+            {view.map((item, i) => (
+              <Card
+                key={item.key}
+                item={item}
+                emphasized={i === centerIdxInView}
+                onClick={() => (i === centerIdxInView ? openCenter() : null)}
+                onSoon={showToast}
               />
-              {/* Badge */}
-              <span
-                className={[
-                  "absolute top-2 left-2 rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em]",
-                  p.tag === "Limited" ? "bg-fuchsia-500/15 border-fuchsia-400/30 text-fuchsia-200" :
-                  p.tag === "Signed" ? "bg-emerald-500/15 border-emerald-400/30 text-emerald-200" :
-                  p.tag === "Preorder" ? "bg-cyan-500/15 border-cyan-400/30 text-cyan-200" :
-                  "bg-white/10 border-white/20 text-white/80"
-                ].join(" ")}
-              >
-                {p.tag}
-              </span>
-            </div>
-            <div className="flex items-center justify-between min-h-[3.25rem]">
-              <h3 className="font-mono tracking-[0.15em] text-white leading-snug">{p.title}</h3>
-            </div>
-            <div className="mt-2 mb-2">
-              <div className="flex items-baseline gap-3">
-                <span className="text-white font-semibold">${p.store.toFixed(2)}</span>
-              </div>
-            </div>
-            <div className="mt-auto pt-3 text-xs text-white/50">
-              Preview of what will be offered — checkout happens on our external store.
-            </div>
-          </motion.div>
-          );
-        })}
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Note */}
-      <p className="mt-10 text-center text-xs text-white/50">
-        The cart lives on our external store. Want an email when it goes live? {" "}
-        <a href="#subscribe" className="underline decoration-dotted hover:text-white">Join the list</a>.
-      </p>
+      {toast && (
+        <div className="fixed inset-x-0 bottom-6 z-[95] flex justify-center">
+          <div className="text-xs px-3 py-2 rounded-lg bg-white/90 text-black shadow-md">{toast}</div>
+        </div>
+      )}
     </section>
+  );
+}
+
+function Card({ item, emphasized, onClick, onSoon }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group text-left rounded-2xl border border-white/10 bg-[#0c0c0c] shadow-2xl overflow-hidden w-[260px] sm:w-[300px] md:w-[320px] h-[420px] sm:h-[480px] md:h-[520px] transform-gpu will-change-transform transition-transform duration-300 ${
+  emphasized
+    ? 'scale-[1.05] rotate-y-0 z-20'
+    : 'scale-[0.92] -rotate-y-6'
+} hover:scale-[1.0]`}
+    >
+      <div className="relative h-[260px] sm:h-[300px] md:h-[340px] bg-black will-change-contents contain-paint">
+        <img
+          src={item.img}
+          alt={item.title}
+          loading={emphasized ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchpriority={emphasized ? 'high' : 'low'}
+          sizes="(min-width: 1024px) 320px, 300px"
+          className={`absolute inset-0 object-contain ${(item.key === 'special' || item.key === 'signed-limited') ? 'w-[80%] h-[80%] m-auto' : 'w-full h-full'}`}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-white/20" />
+      </div>
+      <div className="p-4 h-[160px] sm:h-[180px] md:h-[180px] flex flex-col">
+        <div className="flex items-center justify-between">
+          <h3 className="font-mono tracking-[0.18em] text-white text-sm uppercase">{item.title}</h3>
+          <span className="text-[10px] uppercase tracking-[0.18em] text-white/60">Preview</span>
+        </div>
+        <p className="text-white/60 text-sm mt-1 line-clamp-2">{item.subtitle}</p>
+        <div className="mt-auto flex flex-col gap-2">
+          {item.comingSoon && (
+            <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/70">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-yellow-300" />
+              Coming soon
+            </div>
+          )}
+          <div className={`transition-opacity duration-300 ${emphasized ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+            {item.href ? (
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-white/15 bg-white text-black px-4 py-2 text-sm hover:opacity-90 transition shadow w-full"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+                  <path d="M14 3h7v7h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" />
+                </svg>
+                Shop {item.title}
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onSoon && onSoon('Coming soon'); }}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-white/15 bg-white/10 text-white px-4 py-2 text-sm hover:bg-white/15 transition shadow w-full"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+                  <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-2h2Zm0-4h-2V7h2Z" />
+                </svg>
+                {item.title}: Coming soon
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </button>
   );
 }

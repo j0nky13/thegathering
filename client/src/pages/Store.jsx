@@ -73,7 +73,7 @@ export default function Store() {
       {/* Hero */}
       <div className="mb-10 text-center">
         <h1 className="font-mono tracking-[0.25em] text-2xl sm:text-3xl text-white">STORE</h1>
-        <p className="text-white/70 mt-3">A clean, centered carousel. Desktop shows 3 items; mobile shows 1.</p>
+        <p className="text-white/70 mt-3">Discover our editions and merchandise below.</p>
       </div>
 
       {/* Stage */}

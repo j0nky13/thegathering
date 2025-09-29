@@ -7,11 +7,9 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 
 // --- Lightweight Book Extras page ---
-// • Single CTA to open a fullscreen photo lightbox (no grid)
-// • Bottom caption overlay on top of the image
-// • Keyboard arrows, swipe, big click-zones, Esc to close
+// • Fullscreen photo lightbox with captions
 // • Optional deep links via ?slide=1-based
-// • Sneak Peek PDF section
+// • Sneak Peek section with PDF (new tab) + Audio (modal)
 
 export default function BookExtras() {
   // Gallery items (swap paths/titles/descriptions as needed)
@@ -98,9 +96,26 @@ export default function BookExtras() {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const [pdfOpen, setPdfOpen] = useState(false);
+  const [audioInlineOpen, setAudioInlineOpen] = useState(false);
 
   const [shareToast, setShareToast] = useState(false);
   const hideToastRef = useRef(null);
+
+  // --- Audio Prologue player state ---
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [curTime, setCurTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.9);
+  const [isSeeking, setIsSeeking] = useState(false);
+
+  const formatTime = (secs) => {
+    if (!Number.isFinite(secs)) return "0:00";
+    const s = Math.max(0, Math.floor(secs));
+    const m = Math.floor(s / 60);
+    const r = String(s % 60).padStart(2, "0");
+    return `${m}:${r}`;
+  };
 
   const showShareToast = () => {
     setShareToast(true);
@@ -121,7 +136,7 @@ export default function BookExtras() {
 
   const shareCurrent = async () => {
     const url = currentSlideUrl();
-    const title = items[selectedIndex]?.title || 'Photo';
+    const title = items[selectedIndex]?.title || "Photo";
     const text = `Check this out: ${title}`;
     try {
       if (navigator.share) {
@@ -135,9 +150,31 @@ export default function BookExtras() {
       await navigator.clipboard.writeText(url);
       showShareToast();
     } catch (_) {
-      window.prompt('Copy this link', url);
+      window.prompt("Copy this link", url);
     }
   };
+
+  // Wire up audio element events
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    const onTime = () => { if (!isSeeking) setCurTime(a.currentTime || 0); };
+    const onLoaded = () => setDuration(a.duration || 0);
+    const onEnded = () => setIsPlaying(false);
+
+    a.addEventListener("timeupdate", onTime);
+    a.addEventListener("loadedmetadata", onLoaded);
+    a.addEventListener("ended", onEnded);
+
+    a.volume = volume;
+
+    return () => {
+      a.removeEventListener("timeupdate", onTime);
+      a.removeEventListener("loadedmetadata", onLoaded);
+      a.removeEventListener("ended", onEnded);
+    };
+  }, [isSeeking, volume]);
 
   // Deep-link for PDF (?peek=1)
   const setURLPeek = () => {
@@ -272,13 +309,70 @@ export default function BookExtras() {
     setURLSlide(nextIdx);
   };
 
+  // ESC closes only the PDF modal
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') closePDF(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        closePDF();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   useEffect(() => () => clearTimeout(hideToastRef.current), []);
+
+  // --- Audio controls ---
+  const togglePlay = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (isPlaying) {
+      a.pause();
+      setIsPlaying(false);
+    } else {
+      try {
+        await a.play();
+        setIsPlaying(true);
+      } catch {
+        // autoplay blocked
+      }
+    }
+  };
+
+  const handleSeekMouseDown = () => setIsSeeking(true);
+  const handleSeekMouseUp = (e) => {
+    const a = audioRef.current; if (!a) return;
+    const v = Number(e.target.value);
+    a.currentTime = v;
+    setCurTime(v);
+    setIsSeeking(false);
+  };
+  const handleSeekChange = (e) => setCurTime(Number(e.target.value));
+
+  const handleVolumeChange = (e) => {
+    const v = Number(e.target.value);
+    setVolume(v);
+    if (audioRef.current) audioRef.current.volume = v;
+  };
+
+  const handleSkip = (delta) => {
+    const a = audioRef.current; if (!a) return;
+    const next = Math.max(0, Math.min((a.currentTime || 0) + delta, duration || 0));
+    a.currentTime = next;
+    setCurTime(next);
+  };
+
+  const revealAndPlayInline = () => {
+    if (audioInlineOpen) {
+      try { if (audioRef.current) audioRef.current.pause(); } catch {}
+      setIsPlaying(false);
+      setAudioInlineOpen(false);
+    } else {
+      setAudioInlineOpen(true);
+      // kick playback after render
+      setTimeout(() => { togglePlay(); }, 120);
+    }
+  };
 
   return (
     <div className="px-4">
@@ -336,6 +430,7 @@ export default function BookExtras() {
         .sparkle.s4 { bottom:10px; right:18px; animation-delay:.4s }
         @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
       `}</style>
+
       {/* Header */}
       <section className="max-w-6xl mx-auto pt-16 pb-8 text-center">
         <h1 className="text-2xl md:text-3xl font-mono uppercase tracking-[0.25em] text-white">Book Extras</h1>
@@ -373,19 +468,123 @@ export default function BookExtras() {
         </div>
       </section>
 
-      {/* Sneak Peek: Chapter 1 PDF */}
+      {/* Sneak Peek */}
       <section className="max-w-6xl mx-auto pb-24 text-center flex flex-col items-center">
-        <h2 className="text-xl md:text-2xl font-mono uppercase tracking-[0.2em] text-white mb-4">Sneak Peek: Chapter 1</h2>
-        <p className="text-white/70 mb-4">Click the link for a sneak peek!</p>
-        <div className="flex items-center justify-center gap-3">
-          <a
-            href="/sneakpeek.pdf"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15"
-          >
-            Open in new tab
-          </a>
+        <h2 className="text-xl md:text-2xl font-mono uppercase tracking-[0.2em] text-white mb-4">Sneak Peek: Prologue</h2>
+        <p className="text-white/70 mb-4">Choose how you'd like to preview:</p>
+        <div className="w-full max-w-xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <a
+              href="/sneakpeek.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-base md:px-3 md:py-1.5 md:text-sm rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15"
+            >
+              Text version
+            </a>
+            <button
+              type="button"
+              onClick={revealAndPlayInline}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-base md:px-3 md:py-1.5 md:text-sm rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15"
+              aria-expanded={audioInlineOpen}
+              aria-controls="prologue-audio-inline"
+            >
+              {audioInlineOpen ? 'Hide audio' : 'Audio Version'}
+            </button>
+          </div>
+
+          {audioInlineOpen && (
+            <div id="prologue-audio-inline" className="mt-4">
+              {/* Hidden native audio element */}
+              <audio ref={audioRef} src="/prologue.mp3" preload="metadata" />
+
+              {/* Compact inline player */}
+              <div
+                className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-left shadow-lg"
+                role="group"
+                aria-label="Audio player: Prologue"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+                  if (e.code === 'ArrowRight') { handleSkip(5); }
+                  if (e.code === 'ArrowLeft') { handleSkip(-5); }
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={togglePlay}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                    className="shrink-0 h-9 w-9 grid place-items-center rounded-full bg-white/90 text-black hover:bg-white"
+                  >
+                    {isPlaying ? (
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+                        <path d="M7 6h3v12H7zM14 6h3v12h-3z" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </button>
+
+                  <div className="flex-1">
+                    <input
+                      type="range"
+                      min={0}
+                      max={Math.max(0, duration)}
+                      step={0.1}
+                      value={curTime}
+                      onMouseDown={handleSeekMouseDown}
+                      onTouchStart={handleSeekMouseDown}
+                      onChange={handleSeekChange}
+                      onMouseUp={handleSeekMouseUp}
+                      onTouchEnd={handleSeekMouseUp}
+                      aria-label="Seek"
+                      className="w-full accent-white"
+                    />
+                    <div className="mt-1 flex items-center justify-between text-[11px] text-white/70">
+                      <div>{formatTime(curTime)}</div>
+                      <div>{formatTime(duration)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSkip(-10)}
+                    className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15 text-sm"
+                  >
+                    -10s
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSkip(10)}
+                    className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15 border border-white/15 text-sm"
+                  >
+                    +10s
+                  </button>
+
+                  <div className="ml-auto flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/70" fill="currentColor" aria-hidden>
+                      <path d="M4 9v6h4l5 5V4L8 9H4z" />
+                    </svg>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={volume}
+                      onChange={handleVolumeChange}
+                      aria-label="Volume"
+                      className="w-24 accent-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -403,14 +602,13 @@ export default function BookExtras() {
         styles={{ root: { "--yarl__color_backdrop": "rgba(0,0,0,0.92)" } }}
         on={{
           view: ({ index }) => {
-            if (typeof index === 'number') {
+            if (typeof index === "number") {
               setSelectedIndex(index);
               setURLSlide(index);
             }
           },
         }}
       />
-
 
       {shareToast && (
         <div className="fixed inset-x-0 bottom-6 z-[95] flex justify-center">
@@ -420,6 +618,7 @@ export default function BookExtras() {
         </div>
       )}
 
+      {/* PDF Modal */}
       {pdfOpen && (
         <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closePDF} aria-hidden />
@@ -439,7 +638,7 @@ export default function BookExtras() {
 
               {/* Header */}
               <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
-                <div className="text-white/90 font-mono uppercase tracking-[0.2em] text-xs">Sneak Peek: Chapter 1</div>
+                <div className="text-white/90 font-mono uppercase tracking-[0.2em] text-xs">Sneak Peek: Prologue</div>
                 <button
                   type="button"
                   onClick={closePDF}
@@ -455,13 +654,14 @@ export default function BookExtras() {
               {/* PDF iframe */}
               <iframe
                 src="/sneakpeek.pdf#view=FitH"
-                title="Sneak Peek Chapter 1"
+                title="Sneak Peek Prologue"
                 className="absolute inset-0 w-full h-full"
               />
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

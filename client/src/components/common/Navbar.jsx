@@ -189,7 +189,7 @@ function SubscribeModal({ open, onClose }) {
             </button>
 
             <h3 className="mb-2 font-mono text-sm uppercase tracking-[0.3em] text-white/90">
-              Join the list
+              Subcribe to updates
             </h3>
             <p className="mb-4 text-sm text-white/70">
               Get updates on preorders, extras, and release dates.
@@ -214,7 +214,7 @@ function SubscribeModal({ open, onClose }) {
                   status === "loading" && "opacity-80 cursor-wait"
                 )}
               >
-                {status === "loading" ? "Joining…" : "Join"}
+                {status === "loading" ? "Subscribing.." : "Subscribe"}
               </button>
             </form>
 
@@ -310,7 +310,7 @@ export default function Navbar() {
             onClick={() => setSubscribeOpen(true)}
             className="inline-flex items-center justify-center rounded-xl border border-white/30 bg-[#ffce00] text-black px-3 py-2 font-mono text-[11px] uppercase tracking-[0.25em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition"
           >
-            Get Notified
+            Subscribe
           </button>
         </div>
 
@@ -393,7 +393,7 @@ export default function Navbar() {
                   onClick={() => { setSubscribeOpen(true); closeWithBurst(); }}
                   className="mt-6 inline-flex justify-center w-full font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-4 py-3 rounded hover:opacity-90 transition"
                 >
-                  Get Notified
+                  Subscribe
                 </button>
               </nav>
             </div>

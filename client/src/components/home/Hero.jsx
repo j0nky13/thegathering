@@ -64,7 +64,7 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           transition={{ duration: 0.35 }}
           className="font-mono text-[12px] tracking-[0.35em] text-white/80 uppercase"
         >
-          COMING SOON:
+          EBook Pre-Orders now open
         </motion.p>
 
         <motion.img
@@ -85,16 +85,14 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           “When the call goes out, will you answer?”
         </motion.p>
 
-        <motion.button
-          type="button"
-          onClick={handleNotify}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.2 }}
-          className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm hover:shadow-md hover:translate-y-[1px] transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
+        <motion.a
+          href="https://www.amazon.com/dp/B0FT66B482"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
         >
-          Get Notified
-        </motion.button>
+          Pre-Order E-Book
+        </motion.a>
       </div>
       {open &&
         createPortal(
@@ -226,3 +224,6 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
     </section>
   );
 }
+
+<style jsx global>{`
+`}</style>

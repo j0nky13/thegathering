@@ -13,7 +13,7 @@ export default function SubscribeForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (res.ok) { setStatus("Subscribed. See you at launch."); setEmail(""); }
+      if (res.ok) { setStatus("Subscribed."); setEmail(""); }
       else setStatus("Error. Try again.");
     } catch {
       setStatus("Network error.");
@@ -34,7 +34,7 @@ export default function SubscribeForm() {
         type="submit"
         className="shrink-0 bg-cyan-500 hover:bg-cyan-400 text-black font-mono text-[12px] uppercase tracking-[0.25em] px-4 py-3 rounded"
       >
-        Join
+        Subscribe
       </button>
       {status && <div className="text-xs text-white/60 self-center min-w-[9ch]">{status}</div>}
     </form>

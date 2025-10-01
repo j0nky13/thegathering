@@ -154,27 +154,31 @@ export default function BookExtras() {
     }
   };
 
-  // Wire up audio element events
+  // Wire up audio element events (attach when player is visible)
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
 
     const onTime = () => { if (!isSeeking) setCurTime(a.currentTime || 0); };
-    const onLoaded = () => setDuration(a.duration || 0);
+    const onLoaded = () => setDuration(Number.isFinite(a.duration) ? a.duration : 0);
+    const onDurationChange = () => setDuration(Number.isFinite(a.duration) ? a.duration : 0);
     const onEnded = () => setIsPlaying(false);
 
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("loadedmetadata", onLoaded);
+    a.addEventListener("durationchange", onDurationChange);
     a.addEventListener("ended", onEnded);
 
+    // ensure volume is applied whenever it changes
     a.volume = volume;
 
     return () => {
       a.removeEventListener("timeupdate", onTime);
       a.removeEventListener("loadedmetadata", onLoaded);
+      a.removeEventListener("durationchange", onDurationChange);
       a.removeEventListener("ended", onEnded);
     };
-  }, [isSeeking, volume]);
+  }, [audioInlineOpen, isSeeking, volume]);
 
   // Deep-link for PDF (?peek=1)
   const setURLPeek = () => {
@@ -357,7 +361,8 @@ export default function BookExtras() {
 
   const handleSkip = (delta) => {
     const a = audioRef.current; if (!a) return;
-    const next = Math.max(0, Math.min((a.currentTime || 0) + delta, duration || 0));
+    const dur = Number.isFinite(a.duration) ? a.duration : (duration || 0);
+    const next = Math.max(0, Math.min((a.currentTime || 0) + delta, dur));
     a.currentTime = next;
     setCurTime(next);
   };

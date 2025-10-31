@@ -58,14 +58,14 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
 
       {/* Content */}
       <div className="relative px-4 text-center max-w-3xl">
-        <motion.p
+        {/* <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           className="font-mono text-[12px] tracking-[0.35em] text-white/80 uppercase"
         >
           EBook Pre-Orders now open
-        </motion.p>
+        </motion.p> */}
 
         <motion.img
           src="/logo4.svg"
@@ -86,12 +86,12 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
         </motion.p>
 
         <motion.a
-          href="https://www.amazon.com/dp/B0FT66B482"
+          href="https://www.amazon.com/gp/aw/d/B0FVSM5SS8/ref=tmm_pap_swatch_0?fbclid=IwVERDUANxItxleHRuA2FlbQExAAEeNyDixrcM7vhVHXvqSB_7lKQiw5wUfc_arpwgMu-Kw0fHiWYZRWzru3qxG6g_aem_LKsJ2dn6iAKpxC8ypDvviA"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
         >
-          Pre-Order E-Book
+          Order Now
         </motion.a>
       </div>
       {open &&

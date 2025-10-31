@@ -304,7 +304,7 @@ export default function Navbar() {
           })}
         </div>
 
-        <div className="hidden md:flex justify-end md:col-start-3">
+        {/* <div className="hidden md:flex justify-end md:col-start-3">
           <button
             type="button"
             onClick={() => setSubscribeOpen(true)}
@@ -312,7 +312,7 @@ export default function Navbar() {
           >
             Subscribe
           </button>
-        </div>
+        </div> */}
 
         {/* Mobile hamburger */}
         <button

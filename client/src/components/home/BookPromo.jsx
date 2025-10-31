@@ -45,10 +45,10 @@ means the permanent end of humanity as they knew it.
               Buy now
             </Link> */}
             <a
-              href="#subscribe"
+              href="https://www.amazon.com/gp/aw/d/B0FVSM5SS8/ref=tmm_pap_swatch_0?fbclid=IwVERDUANxIm9leHRuA2FlbQExAAEeNyDixrcM7vhVHXvqSB_7lKQiw5wUfc_arpwgMu-Kw0fHiWYZRWzru3qxG6g_aem_LKsJ2dn6iAKpxC8ypDvviA"
               className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 text-white px-4 py-2 font-mono text-[12px] uppercase tracking-[0.25em] shadow-sm hover:bg-white/10 hover:translate-y-[1px] transition"
             >
-              Join the fight
+              Buy Now!
             </a>
           </div>
         </div>

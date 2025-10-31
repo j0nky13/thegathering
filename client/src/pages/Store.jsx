@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LucideFileChartColumnIncreasing } from "lucide-react";
 
 export default function Store() {
   // Data (includes Coming Soon entries + Square links)
   const items = useMemo(
     () => [
-      { key: "hardback", title: "Hardback", subtitle: "First edition hardback", href: "https://square.link/u/st5CKlyn", comingSoon: true, img: "/bookcover.png" },
-      { key: "ebook", title: "eBook", subtitle: "Kindle", href: "https://www.amazon.com/dp/B0FT66B482", comingSoon: "preorder", img: "/bookcover.png" },
-      { key: "special", title: "Special Edition", subtitle: "Signed hard and soft cover", href: "https://square.link/u/st5CKlyn", comingSoon: true, img: "/special-edition.png" },
+      { key: "hardback", title: "Hardback", subtitle: "First edition hardback", href: "https://square.link/u/st5CKlyn", comingSoon: false, LucideFileChartColumnIncreasing, img: "/bookcover.png" },
+      { key: "ebook", title: "eBook", subtitle: "Kindle", href: "https://www.amazon.com/dp/B0FT66B482", comingSoon: "Order Now", img: "/bookcover.png" },
+      { key: "special", title: "Special Edition", subtitle: "Signed hard and soft cover", href: "https://square.link/u/st5CKlyn", comingSoon: false, img: "/special-edition.png" },
       { key: "posters", title: "Posters", subtitle: "Large-format prints", href: "https://square.link/u/wZc9j7Tv", img: "/gathering-cover.jpg" },
       { key: "shirts", title: "Shirts", subtitle: "Soft tees, bold art", href: "https://square.link/u/mirlyzq6", img: "/t-shirt.jpeg" },
       { key: "sticker-books", title: "Sticker Books", subtitle: "Collectible mini prints", href: "https://square.link/u/Mm34VSdg", img: "/Gathering-Circle.png" },
-      { key: "softcover", title: "Soft Cover", subtitle: "First edition soft cover", href: "https://square.link/u/st5CKlyn", comingSoon: true, img: "/special-edition.png" },
+      { key: "softcover", title: "Soft Cover", subtitle: "First edition soft cover", href: "https://square.link/u/st5CKlyn", comingSoon: false, img: "/special-edition.png" },
     ],
     []
   );
@@ -158,8 +158,8 @@ function Card({ item, emphasized, onClick, onSoon }) {
         <div className="mt-auto flex flex-col gap-2">
           {item.comingSoon && (
             <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/70">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-yellow-300" />
-              {item.comingSoon === "preorder" ? "Preorder now" : "Available 10/28"}
+              {/* <span className="inline-block h-1.5 w-1.5 rounded-full bg-yellow-300" />
+              {item.comingSoon === "preorder" ? "Preorder now" : "Order Now"} */}
             </div>
           )}
           <div className={`transition-opacity duration-300 ${emphasized ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
@@ -185,7 +185,7 @@ function Card({ item, emphasized, onClick, onSoon }) {
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
                   <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-2h2Zm0-4h-2V7h2Z" />
                 </svg>
-                {item.title}: Coming soon
+                {item.title}: Order Now
               </button>
             )}
           </div>

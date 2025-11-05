@@ -397,6 +397,82 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.aside
+            key="drawer"
+            initial={{ opacity: 0, scale: 1.01 }}
+            animate={{ opacity: 1, scale: 1, x: [0, -1, 1, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.45,
+              ease: "easeOut",
+              times: [0, 0.85, 0.95, 1],
+            }}
+            className="fixed inset-0 h-screen w-screen z-50 md:hidden bg-[#0c0c0c]/95 border-r border-white/10 shadow-2xl"
+          >
+            {/* Drawer header */}
+            <div className="absolute top-0 left-0 right-0 flex items-center justify-center px-4 py-4 border-b border-white/10">
+              <span aria-hidden className="opacity-0 select-none">.</span>
+              <button
+                onClick={closeWithBurst}
+                className="absolute right-4 text-white/90 p-2 rounded hover:bg-white/10"
+                aria-label="Close menu"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-7 w-7"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 6l12 12M18 6L6 18"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Centered navigation */}
+            <div className="h-full w-full flex flex-col items-center justify-center px-6 pt-16">
+              <nav className="w-full max-w-md flex flex-col items-center gap-4">
+                {navItems.map(({ name, path }) => (
+                  <NavLink
+                    key={name}
+                    to={path}
+                    onClick={closeWithBurst}
+                    className={({ isActive }) =>
+                      `w-full py-4 text-center font-mono text-base uppercase tracking-[0.25em] group border border-white/10 rounded hover:bg-white/5 transition ${
+                        isActive
+                          ? "text-cyan-300"
+                          : "text-white/90 hover:text-white"
+                      }`
+                    }
+                  >
+                    <GlitchText>{name}</GlitchText>
+                  </NavLink>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubscribeOpen(true);
+                    closeWithBurst();
+                  }}
+                  className="mt-6 inline-flex justify-center w-full font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-4 py-3 rounded hover:opacity-90 transition"
+                >
+                  Subscribe
+                </button>
+              </nav>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+
       <GlitchBurstPortal show={burst} />
       <SubscribeModal
         open={subscribeOpen}

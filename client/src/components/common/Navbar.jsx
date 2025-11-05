@@ -1,4 +1,3 @@
-// client/src/components/common/Navbar.jsx
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

@@ -1,8 +1,10 @@
+// client/src/components/common/Navbar.jsx
 import { useState, useEffect } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
+import { siteAnnouncement } from "../../config/announcements";
 
 function GlitchText({ children }) {
   return (
@@ -234,13 +236,23 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [subscribeOpen, setSubscribeOpen] = useState(false);
   const [burst, setBurst] = useState(false);
-  const [showDebateBanner, setShowDebateBanner] = useState(true);
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
 
   useEffect(() => {
-    // Hide after Nov 7
-    const today = new Date();
-    const cutoff = new Date("2025-11-07T00:00:00");
-    if (today >= cutoff) setShowDebateBanner(false);
+    // Control announcement visibility from config + date
+    if (!siteAnnouncement || siteAnnouncement.enabled === false) {
+      setShowAnnouncement(false);
+      return;
+    }
+
+    if (!siteAnnouncement.activeUntil) {
+      setShowAnnouncement(true);
+      return;
+    }
+
+    const now = new Date();
+    const cutoff = new Date(siteAnnouncement.activeUntil);
+    setShowAnnouncement(now < cutoff);
   }, []);
 
   function openWithBurst() {
@@ -270,6 +282,8 @@ export default function Navbar() {
     { name: "Extras", path: "/bookextras" },
     { name: "Store", path: "/store" },
   ];
+
+  const hasAnnouncement = showAnnouncement && !!siteAnnouncement;
 
   return (
     <nav className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 backdrop-blur text-white shadow-sm relative">
@@ -310,13 +324,24 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* AI Debate banner, same width as nav items */}
-            {showDebateBanner && (
-              <Link to="https://event.gives/debate" className="inline-flex">
-                <div className="w-full rounded-md bg-[#ffce00] text-black px-6 py-2 text-center font-mono text-[13px] uppercase tracking-[0.15em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition font-semibold">
-                  Attend the Great AI Debate & Book Launch on 11/6
+            {/* Desktop announcement banner, same width as nav items */}
+            {hasAnnouncement && (
+              <a
+                href={siteAnnouncement.link}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex"
+              >
+                <div
+                  className="w-full rounded-md px-6 py-2 text-center font-mono text-[13px] uppercase tracking-[0.15em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition font-semibold"
+                  style={{
+                    backgroundColor: siteAnnouncement.bgColor,
+                    color: siteAnnouncement.textColor,
+                  }}
+                >
+                  {siteAnnouncement.text}
                 </div>
-              </Link>
+              </a>
             )}
           </div>
         </div>
@@ -335,15 +360,25 @@ export default function Navbar() {
         </button>
       </div>
 
-
-      {/* Mobile AI Debate banner (visible only on small screens) */}
-      {showDebateBanner && (
+      {/* Mobile announcement banner */}
+      {hasAnnouncement && (
         <div className="md:hidden flex justify-center mt-2">
-          <Link to="https://event.gives/debate" className="w-[90%]">
-            <div className="w-full rounded-md bg-[#ffce00] text-black px-6 py-3 text-center font-mono text-[13px] uppercase tracking-[0.15em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition font-semibold">
-              Attend the Great AI Debate & Book Launch
+          <a
+            href={siteAnnouncement.link}
+            target="_blank"
+            rel="noreferrer"
+            className="w-[90%]"
+          >
+            <div
+              className="w-full rounded-md px-6 py-3 text-center font-mono text-[13px] uppercase tracking-[0.15em] shadow-sm hover:shadow-md hover:translate-y-[1px] hover:opacity-95 transition font-semibold"
+              style={{
+                backgroundColor: siteAnnouncement.bgColor,
+                color: siteAnnouncement.textColor,
+              }}
+            >
+              {siteAnnouncement.mobileText || siteAnnouncement.text}
             </div>
-          </Link>
+          </a>
         </div>
       )}
 

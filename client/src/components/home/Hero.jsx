@@ -1,11 +1,101 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-// Usage: <Hero imageSrc="/heroimage.png" />
+function GlitchText({ children }) {
+  return (
+    <span className="relative inline-block select-none group">
+      <span className="relative z-10 transition-transform duration-100 group-hover:translate-x-[0.5px] group-hover:-translate-y-[0.5px]">
+        {children}
+      </span>
+      <span
+        aria-hidden
+        className="absolute inset-0 z-0 translate-x-0 translate-y-0 opacity-0 transition-all duration-100 group-hover:translate-x-[2px] group-hover:-translate-y-[1px] group-hover:opacity-70 text-cyan-400 pointer-events-none"
+      >
+        {children}
+      </span>
+      <span
+        aria-hidden
+        className="absolute inset-0 z-0 -translate-x-0 -translate-y-0 opacity-0 transition-all duration-100 group-hover:-translate-x-[2px] group-hover:translate-y-[1px] group-hover:opacity-70 text-[#ff003c] pointer-events-none"
+      >
+        {children}
+      </span>
+    </span>
+  );
+}
+
+function GlitchBurst() {
+  return (
+    <motion.div
+      key="glitch-burst"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 0] }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.45 }}
+      className="fixed inset-0 z-[999] pointer-events-none"
+    >
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 0] }}
+        transition={{ duration: 0.45 }}
+        className="absolute inset-0 bg-black/40"
+      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.3, 0] }}
+        transition={{ duration: 0.45 }}
+        className="fixed inset-0 z-[998] bg-cyan-500/10"
+      />
+      <motion.div
+        initial={{ x: 0, opacity: 0 }}
+        animate={{ x: [0, -4, 3, 0], opacity: [0, 0.6, 0.6, 0] }}
+        transition={{ duration: 0.5 }}
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 50%, rgba(0,255,255,0.25), transparent 60%)",
+          mixBlendMode: "screen",
+        }}
+      />
+      <motion.div
+        initial={{ x: 0, opacity: 0 }}
+        animate={{ x: [0, 3, -2, 0], opacity: [0, 0.25, 0.25, 0] }}
+        transition={{ duration: 0.5 }}
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 50%, rgba(255,0,60,0.25), transparent 60%)",
+          mixBlendMode: "screen",
+        }}
+      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 0] }}
+        transition={{ duration: 0.45 }}
+        className="absolute inset-0"
+        style={{
+          background:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 2px, transparent 4px)",
+        }}
+      />
+    </motion.div>
+  );
+}
+
+function GlitchBurstPortal({ show }) {
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <AnimatePresence>{show && <GlitchBurst />}</AnimatePresence>,
+    document.body
+  );
+}
+
+
 export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "center", videoSrc = "/CTAVideo.mp4" }) {
   const [open, setOpen] = useState(false);
   const [notifyOpen, setNotifyOpen] = useState(false);
+  const [burst, setBurst] = useState(false);
+  const modalRef = useRef(null);
 
   const handleNotify = () => {
     const anchor = document.getElementById('subscribe') || document.querySelector('[data-subscribe-anchor]');
@@ -16,7 +106,6 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
     setNotifyOpen(true);
   };
 
-  // Close on ESC
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") setOpen(false);
@@ -24,6 +113,37 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const focusable = modalRef.current?.querySelectorAll(
+      'a, button, input, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable?.[0];
+    const last = focusable?.[focusable.length - 1];
+
+    first?.focus();
+
+    const trap = (e) => {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', trap);
+    return () => document.removeEventListener('keydown', trap);
+  }, [open]);
+
   return (
     <section className="relative isolate min-h-[90vh] md:min-h-[100vh] flex items-center justify-center overflow-hidden">
       {/* Background image */}
@@ -85,20 +205,25 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           “When the call goes out, will you answer?”
         </motion.p>
 
-        <motion.a
-          href="https://www.amazon.com/gp/aw/d/B0FVSM5SS8/ref=tmm_pap_swatch_0?fbclid=IwVERDUANxItxleHRuA2FlbQExAAEeNyDixrcM7vhVHXvqSB_7lKQiw5wUfc_arpwgMu-Kw0fHiWYZRWzru3qxG6g_aem_LKsJ2dn6iAKpxC8ypDvviA"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
+        <motion.button
+          onClick={() => {
+            setBurst(true);
+            setTimeout(() => setOpen(true), 120);
+            setTimeout(() => setBurst(false), 500);
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.18 }}
+          className="inline-block mt-8 font-mono text-[12px] uppercase tracking-[0.25em] text-black bg-[#ffce00] px-5 py-3 rounded-xl border border-black/10 shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffce00]"
         >
           Order Now
-        </motion.a>
+        </motion.button>
       </div>
       {open &&
         createPortal(
           (
             <div
-              id="hero-video-modal"
+              id="hero-purchase-modal"
               role="dialog"
               aria-modal="true"
               className="fixed inset-0 z-[9999] flex items-center justify-center"
@@ -111,29 +236,58 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
 
               {/* Dialog */}
               <motion.div
+                ref={modalRef}
                 initial={{ opacity: 0, scale: 0.98, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
-                className="relative z-10 w-[92vw] max-w-4xl aspect-video bg-black rounded-xl shadow-2xl overflow-hidden border border-white/10"
+                className="relative z-10 w-[92vw] max-w-md bg-[#0b0b0b] rounded-xl shadow-2xl overflow-hidden border border-white/10 p-8 md:p-10"
+                onClick={(e) => e.stopPropagation()}
               >
-                {/* Close button */}
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
-                  aria-label="Close video"
+                  className="absolute top-4 right-4 text-white/80 hover:text-[#ffce00] transition font-mono text-lg"
+                  aria-label="Close"
                 >
                   ✕
                 </button>
 
-                {/* Video */}
-                <video
-                  src={videoSrc}
-                  className="h-full w-full"
-                  controls
-                  autoPlay
-                  playsInline
-                />
+                <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-white/85 mb-4 text-center">
+                  <GlitchText>Choose Your Store</GlitchText>
+                </h3>
+
+                <div className="space-y-3">
+
+                  {[
+                    {
+                      name: "Amazon",
+                      url: "https://www.amazon.com/Gathering-W-K-Rader/dp/B0FVSM5SS8",
+                    },
+                    {
+                      name: "Barnes & Noble",
+                      url: "https://www.barnesandnoble.com/w/the-gathering-w-k-rader/1148604748?ean=9798999082107",
+                    },
+                    {
+                      name: "Books-A-Million",
+                      url: "https://www.booksamillion.com/p/Gathering/W-K-Rader/9798999082107",
+                    },
+                    {
+                      name: "Buy Direct (Signed Copy)",
+                      url: "https://checkout.square.site/merchant/PNY7YGK2CAS3X/checkout/N4PYILSSH7Y2ASTC3W7QS5FN",
+                    }
+                  ].map((store) => (
+                    <a
+                      key={store.name}
+                      href={store.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs uppercase tracking-[0.25em] group transition inline-flex items-center justify-center border border-white/30 rounded-md px-4 py-4 hover:bg-[#ffce00] hover:text-black text-white/90 w-full"
+                    >
+                      <GlitchText>{store.name}</GlitchText>
+                    </a>
+                  ))}
+
+                </div>
               </motion.div>
             </div>
           ),
@@ -221,6 +375,7 @@ export default function Hero({ imageSrc = "/heroimage.png", objectPosition = "ce
           ),
           document.body
         )}
+      <GlitchBurstPortal show={burst} />
     </section>
   );
 }

@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 
 export default function BookPromo({
-  coverSrc = "/gathering-cover.jpg",   // drop your cover into /public and name it cover.jpg (or pass a prop)
+  coverSrc = "/gathering-cover.jpg",
   title = "The Gathering",
   author = "W. K. Rader",
 }) {
@@ -10,14 +10,36 @@ export default function BookPromo({
     <section className="px-4 pt-28 pb-16">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
         {/* Cover */}
-        <div className="relative w-full max-w-xs mx-auto md:max-w-full aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-[#0c0c0c] shadow-2xl">
+        <div className="relative w-full max-w-xs mx-auto md:max-w-full aspect-[3/4] rounded-2xl overflow-visible">
+          <div className="relative h-full w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0c0c0c] shadow-2xl">
+            <img
+              src={coverSrc}
+              alt={`${title} book cover`}
+              className="h-full w-full object-cover"
+            />
+
+            {/* subtle overlay/gloss */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+          </div>
+
+          {/* Bestseller badge */}
           <img
-            src={coverSrc}
-            alt={`${title} book cover`}
-            className="h-full w-full object-cover"
+            src="/bestseller.PNG"
+            alt="Bestseller badge"
+            className="
+              absolute
+              -top-0
+              -right-0
+              w-16
+              sm:w-20
+              md:w-24
+              rotate-12
+              drop-shadow-2xl
+              z-30
+              pointer-events-none
+              select-none
+            "
           />
-          {/* subtle overlay/gloss */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         </div>
 
         {/* Copy + CTAs */}
@@ -25,16 +47,19 @@ export default function BookPromo({
           <h2 className="font-mono tracking-[0.25em] text-white text-xl sm:text-2xl">
             {title}
           </h2>
+
           <p className="text-white/60 mt-1 text-sm uppercase tracking-[0.2em]">
             {author}
           </p>
 
           <p className="text-white/80 mt-5 leading-relaxed">
-             In a world silenced by AI-enforced obedience, a small group of rebels known as “The
-Gathering” emerges from the shadows. Led by a reluctant mechanic and joined by a
-curious teen, a brilliant coder, and a grizzled engineer, they uncover a plan to dismantle the
-global control system. They must risk everything to restore free will, knowing that failure
-means the permanent end of humanity as they knew it.
+            In a world silenced by AI-enforced obedience, a small group of
+            rebels known as “The Gathering” emerges from the shadows. Led by a
+            reluctant mechanic and joined by a curious teen, a brilliant coder,
+            and a grizzled engineer, they uncover a plan to dismantle the global
+            control system. They must risk everything to restore free will,
+            knowing that failure means the permanent end of humanity as they
+            knew it.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -44,6 +69,7 @@ means the permanent end of humanity as they knew it.
             >
               Buy now
             </Link> */}
+
             <a
               href="https://www.amazon.com/gp/aw/d/B0FVSM5SS8/ref=tmm_pap_swatch_0?fbclid=IwVERDUANxIm9leHRuA2FlbQExAAEeNyDixrcM7vhVHXvqSB_7lKQiw5wUfc_arpwgMu-Kw0fHiWYZRWzru3qxG6g_aem_LKsJ2dn6iAKpxC8ypDvviA"
               className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 text-white px-4 py-2 font-mono text-[12px] uppercase tracking-[0.25em] shadow-sm hover:bg-white/10 hover:translate-y-[1px] transition"
